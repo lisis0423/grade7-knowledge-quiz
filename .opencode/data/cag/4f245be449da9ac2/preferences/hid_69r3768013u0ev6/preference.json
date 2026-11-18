@@ -1,0 +1,26 @@
+[
+  {
+    "id": "9fbfbbe586a24f399ca27b273fbf9255",
+    "userID": "hid_69r3768013u0ev6",
+    "domainID": "hid_69r3768013u0ev6",
+    "type": "Language preference",
+    "content": "prefers to interact in Chinese",
+    "remark": "new",
+    "namespace": "DevMate",
+    "createTime": "2026-11-18T15:52:44.050Z",
+    "updateTime": "2026-11-18T15:52:44.050Z",
+    "isDeleted": false
+  },
+  {
+    "id": "75b26407c3534fc8aa8793d6a70d45bc",
+    "userID": "hid_69r3768013u0ev6",
+    "domainID": "hid_69r3768013u0ev6",
+    "type": "Explanation preference",
+    "content": "prefers AI to directly complete the implementation using the provided API rather than only give guidance or explanations",
+    "remark": "new",
+    "namespace": "DevMate",
+    "createTime": "2026-11-18T15:52:44.057Z",
+    "updateTime": "2026-11-18T15:52:44.057Z",
+    "isDeleted": false
+  }
+]

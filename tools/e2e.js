@@ -13,11 +13,18 @@ const SCRIPTS = [
   'js/audio.js',
   'data/items.js',
   'data/missions.js',
+  'data/missions-more.js',
   'data/intro.js',
   'data/geography-1.js',
   'data/geography-2.js',
   'data/geography-3.js',
   'data/geography-4.js',
+  'data/math.js',
+  'data/chinese.js',
+  'data/english.js',
+  'data/biology.js',
+  'data/history.js',
+  'data/politics.js',
   'data/placeholders.js',
   'js/rpg.js',
   'js/quiz.js',
@@ -171,11 +178,18 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   /* ---------- 1. 基地首页 ---------- */
   console.log('\n[1] 侦查员基地');
   check('渲染 7 张科目卡', $$('.subject-card').length === 7, $$('.subject-card').length);
-  check('6 个占位科目', $$('.subject-card.placeholder').length === 6);
+  check('六科全部可玩，没有占位卡', $$('.subject-card.placeholder').length === 0,
+    $$('.subject-card.placeholder').length);
   check('角色卡出现', !!$('.agent-card'));
   check('初始等级 Lv.1', txt($('.agent-lv')) === 'Lv.1', txt($('.agent-lv')));
   check('装备舱入口存在', !!$('#toBag'));
-  check('显示 11 个任务', txt($('.hero-stats')).indexOf('0/11') !== -1, txt($('.hero-stats')));
+  check('显示 35 个任务', txt($('.hero-stats')).indexOf('0/35') !== -1, txt($('.hero-stats')));
+  check('数学 4 关', w.GameSubjects.get('math').levels.length === 4);
+  check('语文 4 关', w.GameSubjects.get('chinese').levels.length === 4);
+  check('英语 4 关', w.GameSubjects.get('english').levels.length === 4);
+  check('生物 4 关', w.GameSubjects.get('biology').levels.length === 4);
+  check('历史 4 关', w.GameSubjects.get('history').levels.length === 4);
+  check('道法 4 关', w.GameSubjects.get('politics').levels.length === 4);
 
   /* ---------- 2. 任务列表 / 简报 / 难度 ---------- */
   console.log('\n[2] 任务简报与三档难度');
@@ -447,10 +461,46 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   check('报告显示等级', txt($('#view')).indexOf('Lv.') !== -1);
 
   await go('#/');
-  check('首页星星 5/33', txt($('.hero-stats')).indexOf('5/33') !== -1, txt($('.hero-stats')));
-  check('首页已挑战 2 个任务', txt($('.hero-stats')).indexOf('2/11') !== -1, txt($('.hero-stats')));
+  check('首页星星 5/105', txt($('.hero-stats')).indexOf('5/105') !== -1, txt($('.hero-stats')));
+  check('首页已挑战 2 个任务', txt($('.hero-stats')).indexOf('2/35') !== -1, txt($('.hero-stats')));
   check('角色卡等级已提升', txt($('.agent-lv')) !== 'Lv.1', txt($('.agent-lv')));
   check('角色卡显示金币', txt($('.agent-meta')).indexOf('🪙') !== -1);
+
+  /* ---------- 10. 六科任务冒烟 ---------- */
+  console.log('\n[10] 六科任务');
+  const extraSubjects = [
+    ['math', '数学任务 01'],
+    ['chinese', '语文任务 01'],
+    ['english', '英语任务 01'],
+    ['biology', '生物任务 01'],
+    ['history', '历史任务 01'],
+    ['politics', '道法任务 01']
+  ];
+  for (const [sid, code] of extraSubjects) {
+    await go('#/subject/' + sid);
+    check(sid + ' 任务列表 4 关', $$('.level-card').length === 4, $$('.level-card').length);
+    await click($$('.level-card')[0], 130);
+    check(sid + ' 进入简报', w.location.hash.indexOf('#/brief/' + sid) === 0, w.location.hash);
+    check(sid + ' 简报有任务代号', txt($('.brief-badge')).indexOf(code) !== -1, txt($('.brief-badge')));
+    check(sid + ' 简报有督察台词', txt($('.brief-check')).indexOf('督察') !== -1, txt($('.brief-check')));
+  }
+
+  await go('#/play/math/math-7a-1/agent');
+  const mathQ = findQuestion();
+  check('数学题能匹配到题库', !!mathQ);
+  await answerCorrectly(mathQ);
+  check('数学答对反馈正常', !!$('.qfeedback.ok'));
+  check('数学得分正常', parseInt(txt($('#scorePill')), 10) >= 100, txt($('#scorePill')));
+
+  check('数学第 3 关有督察追问',
+    Object.keys(w.GameMissions.followUps('math-7a-3')).length === 1);
+  check('语文第 2 关有督察追问',
+    Object.keys(w.GameMissions.followUps('chn-7a-2')).length === 1);
+  check('六科剧情全部注册',
+    extraSubjects.every(([sid]) => {
+      const firstLevel = w.GameSubjects.get(sid).levels[0];
+      return !!w.GameMissions.get(firstLevel.id);
+    }));
 
   /* ---------- 9. 判分函数 ---------- */
   console.log('\n[9] 判分与规则函数');

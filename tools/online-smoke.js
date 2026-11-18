@@ -54,7 +54,8 @@ function check(name, cond, extra) {
   check('页面标题正确', d.title.indexOf('知识闯关') !== -1, d.title);
   check('CSS link 已加载', !!$('link[href="css/style.css"]'));
   check('脚本全部执行（GameStore 可用）', typeof w.GameStore === 'object');
-  check('题库已注册（11 个任务）', w.GameSubjects.level('geography', 'geo-7a-1') !== null);
+  check('题库已注册（7 科 35 任务）', w.GameSubjects.all().length === 7 &&
+    w.GameSubjects.get('math').levels.length === 4);
   check('开场漫画自动进入', w.location.hash === '#/intro', w.location.hash);
   check('6 个分镜圆点', $$('.comic-dots i').length === 6, $$('.comic-dots i').length);
   check('第 1 格画面渲染', !!$('#comicArt svg'));
@@ -71,7 +72,8 @@ function check(name, cond, extra) {
   console.log('\n[3] 首页与科目');
   check('7 张科目卡', $$('.subject-card').length === 7, $$('.subject-card').length);
   check('角色卡出现', !!$('.agent-card'));
-  check('显示 11 个任务', txt($('.hero-stats')).indexOf('0/11') !== -1, txt($('.hero-stats')));
+  check('显示 35 个任务', txt($('.hero-stats')).indexOf('0/35') !== -1, txt($('.hero-stats')));
+  check('六科全部可玩', w.GameSubjects.playable().length === 7);
   await click($('[data-subject="geography"]'), 150);
   check('进入地理任务列表', w.location.hash === '#/subject/geography', w.location.hash);
   check('11 个任务卡', $$('.level-card').length === 11, $$('.level-card').length);

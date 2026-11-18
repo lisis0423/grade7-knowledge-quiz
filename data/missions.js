@@ -180,6 +180,11 @@
       var map = {};
       map[mission.followUp.questionId] = mission.followUp;
       return map;
+    },
+    extend: function (map) {
+      Object.keys(map).forEach(function (key) {
+        byLevel[key] = map[key];
+      });
     }
   };
 })(window);

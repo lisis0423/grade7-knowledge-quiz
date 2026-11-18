@@ -29,7 +29,11 @@ function run(rel) {
 
 run('js/subjects.js');
 sandbox.GameSubjects = sandbox.window.GameSubjects;
-['data/geography-1.js', 'data/geography-2.js', 'data/geography-3.js', 'data/geography-4.js', 'data/placeholders.js'].forEach(run);
+['data/missions.js', 'data/missions-more.js', 'data/intro.js',
+  'data/geography-1.js', 'data/geography-2.js', 'data/geography-3.js', 'data/geography-4.js',
+  'data/math.js', 'data/chinese.js', 'data/english.js',
+  'data/biology.js', 'data/history.js', 'data/politics.js',
+  'data/placeholders.js'].forEach(run);
 run('js/quiz.js');
 
 const GS = sandbox.GameSubjects;

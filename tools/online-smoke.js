@@ -1,6 +1,8 @@
 /* 线上页面冒烟测试：node tools/online-smoke.js */
+const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require(path.join(__dirname, 'node_modules', 'jsdom'));
+const failList = [];
 
 const URL = 'https://lisis0423.github.io/grade7-knowledge-quiz/';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -13,6 +15,7 @@ function check(name, cond, extra) {
     console.log('  ✔ ' + name);
   } else {
     fail += 1;
+    failList.push(name + (extra !== undefined ? '  → ' + extra : ''));
     console.log('  ✘ ' + name + (extra !== undefined ? '  → ' + extra : ''));
   }
 }
@@ -48,6 +51,10 @@ function check(name, cond, extra) {
     if (!el) throw new Error('元素不存在');
     el.click();
     await sleep(ms === undefined ? 80 : ms);
+  };
+  const go = async (hash) => {
+    w.location.hash = hash;
+    await sleep(140);
   };
 
   console.log('\n[1] 加载与首屏');
@@ -99,14 +106,38 @@ function check(name, cond, extra) {
     check('得分增加', txt($('#scorePill')).indexOf('100') !== -1, txt($('#scorePill')));
   }
 
-  console.log('\n[5] 运行时错误');
+  console.log('\n[5] 知识星图');
+  await go('#/');
+  check('首页有知识星图入口', !!$('#toolMap'));
+  await click($('#toolMap'), 150);
+  check('进入知识星图选科页', w.location.hash === '#/map', w.location.hash);
+  check('7 科可选', $$('[data-map]').length === 7, $$('[data-map]').length);
+  await click($('[data-map="math"]'), 180);
+  check('进入数学知识星图', w.location.hash === '#/map/math', w.location.hash);
+  check('章节已渲染', $$('.kp-chapter').length >= 10, $$('.kp-chapter').length);
+  check('知识点已渲染', $$('.kp-item').length > 0, $$('.kp-item').length);
+  check('显示前置知识', txt($('#kpChapters')).indexOf('前置') !== -1);
+  check('显示常见错误', txt($('#kpChapters')).indexOf('常见错误') !== -1);
+
+  const onlineSearch = $('#kpSearch');
+  onlineSearch.value = '绝对值';
+  onlineSearch.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await sleep(120);
+  check('搜索过滤生效',
+    $$('.kp-item:not([hidden])').length > 0 &&
+    $$('.kp-item:not([hidden])').length < $$('.kp-item').length,
+    $$('.kp-item:not([hidden])').length + '/' + $$('.kp-item').length);
+
+  console.log('\n[6] 运行时错误');
   check('没有未捕获的脚本错误', errors.length === 0, errors.slice(0, 2).join(' | '));
 
+  fs.writeFileSync(path.join(__dirname, 'online-result.txt'), 'pass=' + pass + ' fail=' + fail + '\n' + failList.join('\n'), 'utf8');
   console.log('\n========== 结果 ==========');
   console.log(`通过 ${pass} 项，失败 ${fail} 项`);
   if (fail) process.exitCode = 1;
   dom.window.close();
 })().catch((e) => {
+  fs.writeFileSync(path.join(__dirname, 'online-result.txt'), 'INTERRUPTED\n' + (e.stack || e.message), 'utf8');
   console.error('测试中断：' + e.stack);
   process.exitCode = 1;
 });

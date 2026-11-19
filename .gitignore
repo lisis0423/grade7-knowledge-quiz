@@ -3,4 +3,5 @@ tools/node_modules/
 tools/package.json
 tools/package-lock.json
 shots/
-refs/
+refs/tools/online-result.txt
+tools/e2e-failures.txt

@@ -1,2 +1,7 @@
 start
 22:31:56.011 pwd=C:\Users\Administrator\codearts\2026-11-17-17-57-00
+22:31:56.198 add done code=0
+22:31:56.377 status lines=5
+22:31:56.664 commit done code=0
+22:31:57.368 ls-remote code=128
+22:31:57.370 end

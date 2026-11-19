@@ -1,0 +1,5 @@
+
+=== 同步到 AtomGit ===
+仓库地址: https://atomgit.com/lisis0423/grade7-knowledge-quiz.git
+预期站点: https://lisis0423.atomgit.net/grade7-knowledge-quiz/
+

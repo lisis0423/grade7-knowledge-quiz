@@ -1,0 +1,18 @@
+﻿**********************
+Windows PowerShell 脚本开始
+开始时间: 20261119232506
+用户名: CH-202504112213\Administrator
+RunAs 用户: CH-202504112213\Administrator
+配置名称: 
+计算机: CH-202504112213 (Microsoft Windows NT 10.0.19041.0)
+主机应用程序: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -Command Start-Transcript -Path t.txt -Force; & .\publish-atomgit.ps1 -User lisis0423 -NoPause; Stop-Transcript
+进程 ID: 23248
+PSVersion: 5.1.19041.1
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.19041.1
+BuildVersion: 10.0.19041.1
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************

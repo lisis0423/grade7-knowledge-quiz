@@ -56,9 +56,12 @@ if ($remotes -notcontains $remoteName) {
 # --- 3. 先确认仓库存在，避免认证弹窗白等 --------------------------------
 Write-Step "检查 AtomGit 上的仓库..."
 $previous = $ErrorActionPreference
+$oldPrompt = $env:GIT_TERMINAL_PROMPT
 $ErrorActionPreference = 'Continue'
+$env:GIT_TERMINAL_PROMPT = '0'
 $probe = git -c credential.helper= ls-remote --heads $remoteName 2>&1
 $probeOk = ($LASTEXITCODE -eq 0)
+if ($null -eq $oldPrompt) { Remove-Item Env:\GIT_TERMINAL_PROMPT -ErrorAction SilentlyContinue } else { $env:GIT_TERMINAL_PROMPT = $oldPrompt }
 $ErrorActionPreference = $previous
 if (-not $probeOk) {
     Write-Host ""

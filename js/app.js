@@ -333,6 +333,10 @@
           '<span><span class="t-title">装备舱</span><br><span class="t-sub">穿戴装备 · 使用补给</span></span>' +
           '<span class="t-badge ghost-badge">' + Object.keys(p.items || {}).length + '</span>' +
         '</button>' +
+        '<button class="tool-card" type="button" id="toolMap">' +
+          '<span class="t-ico">🗺️</span>' +
+          '<span><span class="t-title">知识星图</span><br><span class="t-sub">章节知识点 · 前置 · 常见错误</span></span>' +
+        '</button>' +
         '<button class="tool-card" type="button" id="toolWrong">' +
           '<span class="t-ico">📕</span>' +
           '<span><span class="t-title">错题本</span><br><span class="t-sub">被督察抓到的漏洞</span></span>' +
@@ -356,6 +360,7 @@
     });
     document.getElementById('toBag').onclick = function () { go('#/bag'); };
     document.getElementById('toolBag').onclick = function () { go('#/bag'); };
+    document.getElementById('toolMap').onclick = function () { go('#/map'); };
     document.getElementById('toolWrong').onclick = function () { go('#/wrong'); };
     document.getElementById('toolStats').onclick = function () { go('#/stats'); };
     document.getElementById('toolSettings').onclick = openSettings;
@@ -399,18 +404,117 @@
     }).join('');
 
     view.innerHTML =
-      '<div class="page-head">' +
-        '<h1>' + esc(subject.icon) + ' ' + esc(subject.name) + '任务列表</h1>' +
-        '<p>' + esc(subject.desc || '') + ' 共 ' + subject.levels.length + ' 个任务，每个任务可选基础 / 中级 / 高级。</p>' +
+      '<div class="page-head with-action">' +
+        '<div><h1>' + esc(subject.icon) + ' ' + esc(subject.name) + '任务列表</h1>' +
+        '<p>' + esc(subject.desc || '') + ' 共 ' + subject.levels.length + ' 个任务，每个任务可选基础 / 中级 / 高级。</p></div>' +
+        '<button class="btn ghost small" id="openMap" type="button">🗺️ 知识星图</button>' +
       '</div>' +
       '<div class="level-list">' + cards + '</div>' +
       '<div class="legend">🌱 基础：6 题，不限时，可重答一次；🛰️ 中级：全题，答错扣分；🔥 高级：全题 + 跨区题，每题限时 20 秒。' +
       '难度越高，奖金、经验和装备品质越好。</div>';
 
+    document.getElementById('openMap').onclick = function () { go('#/map/' + subject.id); };
+
     view.querySelectorAll('[data-level]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         GameAudio.play('click');
         go('#/brief/' + subject.id + '/' + btn.getAttribute('data-level'));
+      });
+    });
+  }
+
+  /* ---------- 知识星图 ---------- */
+
+  function renderMap(subjectId) {
+    var kb = global.GameKnowledge;
+
+    if (!subjectId) {
+      var cards = GameSubjects.playable().map(function (s) {
+        var d = kb ? kb[s.id] : null;
+        var count = d ? d.chapters.reduce(function (n, c) { return n + c.pts.length; }, 0) : 0;
+        return '<button class="subject-card" type="button" data-map="' + s.id + '">' +
+          '<span class="s-tag">' + (count ? count + ' 个知识点' : '暂无') + '</span>' +
+          '<span class="s-top"><span class="s-icon">' + esc(s.icon) + '</span>' +
+          '<span class="s-name">' + esc(s.name) + '</span></span>' +
+          '<span class="s-desc">' + esc(s.desc) + '</span>' +
+          '</button>';
+      }).join('');
+
+      view.innerHTML =
+        '<div class="page-head"><h1>🗺️ 知识星图</h1>' +
+        '<p>从教材知识点图谱整理的章节结构，包含前置知识和常见错误。选择一科开始。</p></div>' +
+        '<div class="subject-grid">' + cards + '</div>' +
+        '<div class="legend">知识点数据来自开源项目 k12-knowledge-points（PolyForm Noncommercial 1.0.0），仅用于个人学习，不可商用。</div>';
+
+      view.querySelectorAll('[data-map]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          go('#/map/' + btn.getAttribute('data-map'));
+        });
+      });
+      return;
+    }
+
+    var data = kb ? kb[subjectId] : null;
+    var subject = GameSubjects.get(subjectId);
+    if (!data || !subject) {
+      notFound('这个科目还没有知识星图。');
+      return;
+    }
+
+    var total = data.chapters.reduce(function (n, c) { return n + c.pts.length; }, 0);
+    var chaptersHTML = data.chapters.map(function (ch, i) {
+      var list = ch.pts.map(function (p) {
+        var typeName = { concept: '概念', procedural: '方法', factual: '事实' }[p.t] || '';
+        var diffName = p.d >= 0.7 ? '较难' : (p.d >= 0.4 ? '中等' : '基础');
+        return '<div class="kp-item">' +
+          '<div class="kp-top"><span class="kp-name">' + esc(p.n) + '</span>' +
+            (typeName ? '<span class="kp-type">' + typeName + '</span>' : '') +
+            '<span class="kp-diff">' + diffName + '</span>' +
+          '</div>' +
+          (p.p && p.p.length
+            ? '<div class="kp-line"><b>前置</b>' + p.p.map(function (x) {
+                return '<span class="kp-tag">' + esc(x) + '</span>';
+              }).join('') + '</div>'
+            : '') +
+          (p.m && p.m.length
+            ? '<div class="kp-line kp-mis"><b>常见错误</b>' + p.m.map(function (x) {
+                return '<span>' + esc(x) + '</span>';
+              }).join('') + '</div>'
+            : '') +
+          '</div>';
+      }).join('');
+
+      return '<details class="kp-chapter"' + (i === 0 ? ' open' : '') + '>' +
+        '<summary><span class="kp-ch-title">' + esc(ch.t) + '</span>' +
+        '<span class="kp-count">' + ch.pts.length + '</span></summary>' +
+        '<div class="kp-list">' + list + '</div>' +
+        '</details>';
+    }).join('');
+
+    view.innerHTML =
+      '<div class="page-head with-action">' +
+        '<div><h1>🗺️ ' + esc(subject.icon) + ' ' + esc(subject.name) + '知识星图</h1>' +
+        '<p>共 ' + data.chapters.length + ' 章 / ' + total + ' 个知识点。点开章节查看前置知识和常见错误。</p></div>' +
+        '<button class="btn ghost small" id="mapBack" type="button">返回任务</button>' +
+      '</div>' +
+      '<div class="kp-search"><input id="kpSearch" type="search" placeholder="搜索知识点，例如：绝对值、光合作用、现在进行时"></div>' +
+      '<div id="kpChapters">' + chaptersHTML + '</div>' +
+      '<div class="legend">知识点数据来自 k12-knowledge-points（PolyForm Noncommercial 1.0.0），仅用于个人学习，不可商用。</div>';
+
+    document.getElementById('mapBack').onclick = function () { go('#/subject/' + subjectId); };
+
+    var search = document.getElementById('kpSearch');
+    search.addEventListener('input', function () {
+      var kw = search.value.trim().toLowerCase();
+      view.querySelectorAll('.kp-chapter').forEach(function (box) {
+        var any = false;
+        box.querySelectorAll('.kp-item').forEach(function (item) {
+          var hit = !kw || item.textContent.toLowerCase().indexOf(kw) !== -1;
+          item.hidden = !hit;
+          if (hit) any = true;
+        });
+        box.hidden = !any;
+        if (kw && any) box.open = true;
       });
     });
   }
@@ -1149,6 +1253,14 @@
         back: '#/'
       });
       renderSubject(parts[1]);
+    } else if (route === 'map') {
+      var mapSubject = parts[1] ? GameSubjects.get(parts[1]) : null;
+      setChrome({
+        title: '知识星图',
+        sub: mapSubject ? mapSubject.name + ' · 章节知识点' : '选择科目',
+        back: parts[1] ? '#/subject/' + parts[1] : '#/'
+      });
+      renderMap(parts[1]);
     } else if (route === 'brief') {
       var s1 = GameSubjects.get(parts[1]);
       var lv1 = GameSubjects.level(parts[1], parts[2]);

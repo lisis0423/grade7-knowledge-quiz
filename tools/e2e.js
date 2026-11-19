@@ -15,6 +15,7 @@ const SCRIPTS = [
   'data/missions.js',
   'data/missions-more.js',
   'data/missions-extra.js',
+  'data/knowledge.js',
   'data/intro.js',
   'data/geography-1.js',
   'data/geography-2.js',
@@ -502,6 +503,32 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       const firstLevel = w.GameSubjects.get(sid).levels[0];
       return !!w.GameMissions.get(firstLevel.id);
     }));
+
+  /* ---------- 11. 知识星图 ---------- */
+  console.log('\n[11] 知识星图');
+  await go('#/');
+  check('首页有知识星图入口', !!$('#toolMap'));
+  await click($('#toolMap'), 130);
+  check('进入知识星图选科页', w.location.hash === '#/map', w.location.hash);
+  check('7 科可选', $$('[data-map]').length === 7, $$('[data-map]').length);
+  await click($('[data-map="math"]'), 150);
+  check('进入数学知识星图', w.location.hash === '#/map/math', w.location.hash);
+  check('数学星图有 10 章以上', $$('.kp-chapter').length >= 10, $$('.kp-chapter').length);
+  check('知识点已渲染', $$('.kp-item').length > 0, $$('.kp-item').length);
+  check('显示前置知识', txt($('#kpChapters')).indexOf('前置') !== -1);
+  check('显示常见错误', txt($('#kpChapters')).indexOf('常见错误') !== -1);
+
+  const kpSearch = $('#kpSearch');
+  kpSearch.value = '绝对值';
+  kpSearch.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await sleep(100);
+  const visibleKp = $$('.kp-item:not([hidden])').length;
+  check('搜索能过滤知识点', visibleKp > 0 && visibleKp < $$('.kp-item').length,
+    visibleKp + '/' + $$('.kp-item').length);
+
+  await click($('#mapBack'), 130);
+  check('返回数学任务列表', w.location.hash === '#/subject/math', w.location.hash);
+  check('任务页有知识星图按钮', !!$('#openMap'));
 
   /* ---------- 9. 判分函数 ---------- */
   console.log('\n[9] 判分与规则函数');

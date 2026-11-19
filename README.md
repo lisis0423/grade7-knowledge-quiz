@@ -38,6 +38,13 @@
 
 把整个文件夹拖到 Netlify Drop（`app.netlify.com/drop`）、Vercel 或 GitHub Pages，会得到一个 `https` 链接。手机收藏这个链接即可，不再依赖家里的电脑。
 
+仓库已经有两套一键发布脚本，推哪个平台就用哪个：
+
+- `publish-github.bat` → GitHub（仓库 `lisis0423/grade7-knowledge-quiz`）
+- `publish-atomgit.bat` → AtomGit（国内访问更稳，仓库建好后运行，按提示输入用户名；密码位置填个人访问令牌）
+
+AtomGit 的 Pages 曾经暂停过，代码托管不受影响；如果它的设置页里没有 Pages 入口，网页版继续用 GitHub Pages 的地址即可。
+
 **方式 C：直接把文件夹传到手机（仅 Android 较方便）**
 
 用微信、QQ 或数据线把文件夹传过去，用支持本地网页的文件管理器打开 `index.html`。iOS 的 Safari 不能直接打开本地文件，不建议用这种方式。
@@ -281,7 +288,7 @@ node tools/e2e.js
 node tools/online-smoke.js
 ```
 
-它会直接加载 GitHub Pages 上的线上地址，检查资源加载、开场漫画、任务列表、难度选择和答题流程，共 25 项。
+它会先从线上抓 `index.html` 和全部脚本，按页面里的顺序在 jsdom 中执行，再检查资源可访问、开场漫画、任务列表、七下关卡、难度选择、答题与知识星图，共 52 项。
 
 ## 七、说明与限制
 

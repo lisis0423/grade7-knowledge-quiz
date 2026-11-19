@@ -45,8 +45,11 @@ if (git status --porcelain) {
 }
 
 # --- 2. 远端 ------------------------------------------------------------
-$remotes = git remote
-if ($remotes -notcontains $remoteName) {
+$previous = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
+$existingUrl = (git remote get-url $remoteName 2>$null)
+$ErrorActionPreference = $previous
+if (-not $existingUrl) {
     Write-Step "添加远端 $remoteName ..."
     git remote add $remoteName $remoteUrl
 } else {

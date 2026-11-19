@@ -5,7 +5,8 @@
 
 param(
     [string]$User = '',
-    [string]$Repo = 'grade7-knowledge-quiz'
+    [string]$Repo = 'grade7-knowledge-quiz',
+    [switch]$NoPause
 )
 
 $ErrorActionPreference = 'Stop'
@@ -72,7 +73,7 @@ if (-not $probeOk) {
     Write-Host ""
     Write-Host "建好后重新运行本脚本即可。"
     Write-Host ""
-    Read-Host "按回车退出"
+    if (-not $NoPause) { Read-Host "按回车退出" }
     exit 1
 }
 
@@ -90,7 +91,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "若是 403 / Authentication failed：密码位置要填个人访问令牌；"
     Write-Host "若是 Connection was reset：网络问题，重试或换网络（手机热点）。"
     Write-Host ""
-    Read-Host "按回车退出"
+    if (-not $NoPause) { Read-Host "按回车退出" }
     exit 1
 }
 
@@ -105,4 +106,4 @@ Write-Host ""
 Write-Hint "说明：AtomGit 的 Pages 功能曾暂停，若设置页没有 Pages 入口，"
 Write-Hint "代码托管仍然可用，网页版游戏继续用 GitHub Pages 的地址访问。"
 Write-Host ""
-Read-Host "按回车退出"
+if (-not $NoPause) { Read-Host "按回车退出" }

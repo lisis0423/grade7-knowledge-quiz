@@ -14,6 +14,7 @@ const SCRIPTS = [
   'data/items.js',
   'data/missions.js',
   'data/missions-more.js',
+  'data/missions-extra.js',
   'data/intro.js',
   'data/geography-1.js',
   'data/geography-2.js',
@@ -183,10 +184,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   check('角色卡出现', !!$('.agent-card'));
   check('初始等级 Lv.1', txt($('.agent-lv')) === 'Lv.1', txt($('.agent-lv')));
   check('装备舱入口存在', !!$('#toBag'));
-  check('显示 35 个任务', txt($('.hero-stats')).indexOf('0/35') !== -1, txt($('.hero-stats')));
-  check('数学 4 关', w.GameSubjects.get('math').levels.length === 4);
+  check('显示 47 个任务', txt($('.hero-stats')).indexOf('0/47') !== -1, txt($('.hero-stats')));
+  check('数学 10 关', w.GameSubjects.get('math').levels.length === 10);
   check('语文 4 关', w.GameSubjects.get('chinese').levels.length === 4);
-  check('英语 4 关', w.GameSubjects.get('english').levels.length === 4);
+  check('英语 10 关', w.GameSubjects.get('english').levels.length === 10);
   check('生物 4 关', w.GameSubjects.get('biology').levels.length === 4);
   check('历史 4 关', w.GameSubjects.get('history').levels.length === 4);
   check('道法 4 关', w.GameSubjects.get('politics').levels.length === 4);
@@ -461,24 +462,24 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   check('报告显示等级', txt($('#view')).indexOf('Lv.') !== -1);
 
   await go('#/');
-  check('首页星星 5/105', txt($('.hero-stats')).indexOf('5/105') !== -1, txt($('.hero-stats')));
-  check('首页已挑战 2 个任务', txt($('.hero-stats')).indexOf('2/35') !== -1, txt($('.hero-stats')));
+  check('首页星星 5/141', txt($('.hero-stats')).indexOf('5/141') !== -1, txt($('.hero-stats')));
+  check('首页已挑战 2 个任务', txt($('.hero-stats')).indexOf('2/47') !== -1, txt($('.hero-stats')));
   check('角色卡等级已提升', txt($('.agent-lv')) !== 'Lv.1', txt($('.agent-lv')));
   check('角色卡显示金币', txt($('.agent-meta')).indexOf('🪙') !== -1);
 
   /* ---------- 10. 六科任务冒烟 ---------- */
   console.log('\n[10] 六科任务');
   const extraSubjects = [
-    ['math', '数学任务 01'],
-    ['chinese', '语文任务 01'],
-    ['english', '英语任务 01'],
-    ['biology', '生物任务 01'],
-    ['history', '历史任务 01'],
-    ['politics', '道法任务 01']
+    ['math', '数学任务 01', 10],
+    ['chinese', '语文任务 01', 4],
+    ['english', '英语任务 01', 10],
+    ['biology', '生物任务 01', 4],
+    ['history', '历史任务 01', 4],
+    ['politics', '道法任务 01', 4]
   ];
-  for (const [sid, code] of extraSubjects) {
+  for (const [sid, code, count] of extraSubjects) {
     await go('#/subject/' + sid);
-    check(sid + ' 任务列表 4 关', $$('.level-card').length === 4, $$('.level-card').length);
+    check(sid + ' 任务列表 ' + count + ' 关', $$('.level-card').length === count, $$('.level-card').length);
     await click($$('.level-card')[0], 130);
     check(sid + ' 进入简报', w.location.hash.indexOf('#/brief/' + sid) === 0, w.location.hash);
     check(sid + ' 简报有任务代号', txt($('.brief-badge')).indexOf(code) !== -1, txt($('.brief-badge')));

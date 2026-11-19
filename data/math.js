@@ -298,6 +298,414 @@
             explain: '钟面被分成 12 大格，每格 30°。3 点整时相差 3 大格，3 × 30° = 90°。'
           }
         ]
+      },
+      {
+        id: 'math-7b-1',
+        title: '第五章 相交线与平行线',
+        subtitle: '对顶角、邻补角、垂线与平行线判定',
+        questions: [
+          {
+            id: 'math7b1-q1',
+            type: 'choice',
+            stem: '两条直线相交，对顶角的关系是（　）',
+            options: ['相等', '互补', '互余', '无法确定'],
+            answer: 0,
+            explain: '对顶角是两个角的两边互为反向延长线，对顶角相等。'
+          },
+          {
+            id: 'math7b1-q2',
+            type: 'judge',
+            stem: '邻补角的两角之和等于 180°。',
+            answer: true,
+            explain: '邻补角既相邻又互补，所以它们的和是 180°。'
+          },
+          {
+            id: 'math7b1-q3',
+            type: 'choice',
+            stem: '从直线外一点到这条直线的所有线段中，最短的是（　）',
+            options: ['垂线段', '斜线段', '最长的那条', '无法比较'],
+            answer: 0,
+            explain: '垂线段最短，这个长度就是点到直线的距离。'
+          },
+          {
+            id: 'math7b1-q4',
+            type: 'choice',
+            stem: '两条直线被第三条直线所截，如果同位角相等，那么这两条直线（　）',
+            options: ['平行', '垂直', '相交', '重合'],
+            answer: 0,
+            explain: '同位角相等，两直线平行，这是平行线的判定方法之一。'
+          },
+          {
+            id: 'math7b1-q5',
+            type: 'judge',
+            stem: '两直线平行，内错角相等。',
+            answer: true,
+            explain: '这是平行线的性质：两直线平行，同位角相等、内错角相等、同旁内角互补。'
+          },
+          {
+            id: 'math7b1-q6',
+            type: 'choice',
+            stem: '两条直线被第三条直线所截，同旁内角互补，则这两条直线（　）',
+            options: ['平行', '垂直', '相交', '无法判断'],
+            answer: 0,
+            explain: '同旁内角互补，两直线平行，这是平行线的又一种判定方法。'
+          },
+          {
+            id: 'math7b1-q7',
+            type: 'judge',
+            stem: '平移不改变图形的形状和大小。',
+            answer: true,
+            explain: '平移只改变图形的位置，不改变图形的形状和大小。'
+          },
+          {
+            id: 'math7b1-q8',
+            type: 'fill',
+            stem: '两条平行线被第三条直线所截，同位角 ____。',
+            accept: ['相等', '一样'],
+            explain: '平行线的性质之一：两直线平行，同位角相等。'
+          }
+        ]
+      },
+      {
+        id: 'math-7b-2',
+        title: '第六章 实数',
+        subtitle: '平方根、立方根、无理数与实数',
+        questions: [
+          {
+            id: 'math7b2-q1',
+            type: 'choice',
+            stem: '9 的算术平方根是（　）',
+            options: ['3', '−3', '9', '81'],
+            answer: 0,
+            explain: '算术平方根是非负的平方根，3² = 9，所以 9 的算术平方根是 3。'
+          },
+          {
+            id: 'math7b2-q2',
+            type: 'choice',
+            stem: '√16 的值是（　）',
+            options: ['4', '−4', '8', '2'],
+            answer: 0,
+            explain: '4² = 16，所以 √16 = 4。注意根号表示算术平方根，结果非负。'
+          },
+          {
+            id: 'math7b2-q3',
+            type: 'choice',
+            stem: '8 的立方根是（　）',
+            options: ['2', '−2', '4', '3'],
+            answer: 0,
+            explain: '2³ = 8，所以 8 的立方根是 2。'
+          },
+          {
+            id: 'math7b2-q4',
+            type: 'choice',
+            stem: '下列各数中，是无理数的是（　）',
+            options: ['π', '0.5', '七分之二十二', '0'],
+            answer: 0,
+            explain: '无理数是无限不循环小数，π 是典型的无理数；0.5、分数和 0 都是有理数。'
+          },
+          {
+            id: 'math7b2-q5',
+            type: 'judge',
+            stem: '负数没有平方根。',
+            answer: true,
+            explain: '任何数的平方都非负，所以负数在实数范围内没有平方根。'
+          },
+          {
+            id: 'math7b2-q6',
+            type: 'fill',
+            stem: '27 的立方根是 ____。',
+            accept: ['3'],
+            hint: '想一个数的三次方等于 27',
+            explain: '3³ = 27，所以 27 的立方根是 3。'
+          },
+          {
+            id: 'math7b2-q7',
+            type: 'judge',
+            stem: '实数与数轴上的点一一对应。',
+            answer: true,
+            explain: '每一个实数都可以用数轴上的一个点表示，数轴上的每一个点都表示一个实数。'
+          },
+          {
+            id: 'math7b2-q8',
+            type: 'choice',
+            stem: '计算 √25 + ∛8 的结果是（　）',
+            options: ['7', '5', '3', '13'],
+            answer: 0,
+            explain: '√25 = 5，∛8 = 2，所以 5 + 2 = 7。'
+          }
+        ]
+      },
+      {
+        id: 'math-7b-3',
+        title: '第七章 平面直角坐标系',
+        subtitle: '点的坐标、象限与平移',
+        questions: [
+          {
+            id: 'math7b3-q1',
+            type: 'choice',
+            stem: '点 (3, −2) 在（　）',
+            options: ['第四象限', '第一象限', '第二象限', '第三象限'],
+            answer: 0,
+            explain: '横坐标为正、纵坐标为负的点在第四象限。'
+          },
+          {
+            id: 'math7b3-q2',
+            type: 'choice',
+            stem: 'x 轴上的点的坐标特点是（　）',
+            options: ['纵坐标为 0', '横坐标为 0', '横纵坐标都为 0', '横纵坐标相等'],
+            answer: 0,
+            explain: 'x 轴上的点纵坐标为 0，y 轴上的点横坐标为 0。'
+          },
+          {
+            id: 'math7b3-q3',
+            type: 'choice',
+            stem: '点 (−1, 4) 在（　）',
+            options: ['第二象限', '第一象限', '第三象限', '第四象限'],
+            answer: 0,
+            explain: '横坐标为负、纵坐标为正的点在第二象限。'
+          },
+          {
+            id: 'math7b3-q4',
+            type: 'judge',
+            stem: '原点的坐标是 (0, 0)。',
+            answer: true,
+            explain: '原点是 x 轴与 y 轴的交点，横、纵坐标都是 0。'
+          },
+          {
+            id: 'math7b3-q5',
+            type: 'choice',
+            stem: '把点 (2, 3) 向右平移 3 个单位长度，得到的点的坐标是（　）',
+            options: ['(5, 3)', '(2, 6)', '(−1, 3)', '(5, 6)'],
+            answer: 0,
+            explain: '向右平移只改变横坐标，横坐标加 3、纵坐标不变，得到 (5, 3)。'
+          },
+          {
+            id: 'math7b3-q6',
+            type: 'fill',
+            stem: '点 A(−2, 5) 的横坐标是 ____。',
+            accept: ['-2', '−2'],
+            explain: '点的坐标写作 (横坐标, 纵坐标)，所以 A(−2, 5) 的横坐标是 −2。'
+          },
+          {
+            id: 'math7b3-q7',
+            type: 'judge',
+            stem: '平行于 y 轴的直线上的点，横坐标都相同。',
+            answer: true,
+            explain: '平行于 y 轴的直线是竖直的，所有点的横坐标相同，纵坐标不同。'
+          },
+          {
+            id: 'math7b3-q8',
+            type: 'choice',
+            stem: '点 P(0, −3) 在（　）',
+            options: ['y 轴上', 'x 轴上', '第一象限', '原点'],
+            answer: 0,
+            explain: '横坐标为 0 的点在 y 轴上，P(0, −3) 位于 y 轴负半轴。'
+          }
+        ]
+      },
+      {
+        id: 'math-7b-4',
+        title: '第八章 二元一次方程组',
+        subtitle: '代入消元、加减消元与实际应用',
+        questions: [
+          {
+            id: 'math7b4-q1',
+            type: 'choice',
+            stem: '下列式子中，是二元一次方程的是（　）',
+            options: ['x + y = 5', 'x² + y = 1', 'x分之1 + y = 2', 'xy = 3'],
+            answer: 0,
+            explain: '二元一次方程含有两个未知数，且未知数的次数都是 1。x + y = 5 符合。'
+          },
+          {
+            id: 'math7b4-q2',
+            type: 'choice',
+            stem: '方程组 x + y = 5，x − y = 1 的解是（　）',
+            options: ['x = 3，y = 2', 'x = 2，y = 3', 'x = 4，y = 1', 'x = 5，y = 0'],
+            answer: 0,
+            explain: '两式相加得 2x = 6，x = 3；代入 x + y = 5 得 y = 2。'
+          },
+          {
+            id: 'math7b4-q3',
+            type: 'judge',
+            stem: '解二元一次方程组可以用代入消元法。',
+            answer: true,
+            explain: '代入消元法和加减消元法都是解二元一次方程组的基本方法。'
+          },
+          {
+            id: 'math7b4-q4',
+            type: 'choice',
+            stem: '方程组 2x + y = 7，x = y + 2 的解是（　）',
+            options: ['x = 3，y = 1', 'x = 1，y = 3', 'x = 2，y = 2', 'x = 4，y = 1'],
+            answer: 0,
+            explain: '把 x = y + 2 代入 2x + y = 7，得 2(y + 2) + y = 7，解得 y = 1，x = 3。'
+          },
+          {
+            id: 'math7b4-q5',
+            type: 'fill',
+            stem: '方程 x + y = 4 的一组正整数解是 x = 1，y = ____。',
+            accept: ['3'],
+            explain: '把 x = 1 代入 x + y = 4，得 y = 3。'
+          },
+          {
+            id: 'math7b4-q6',
+            type: 'choice',
+            stem: '解方程组时，把两个方程相加或相减消去一个未知数，这种方法叫（　）',
+            options: ['加减消元法', '代入消元法', '因式分解法', '配方法'],
+            answer: 0,
+            explain: '通过把两个方程相加或相减来消元的方法叫加减消元法。'
+          },
+          {
+            id: 'math7b4-q7',
+            type: 'choice',
+            stem: '鸡兔同笼，共有 10 个头、28 只脚，鸡和兔各有（　）',
+            options: ['鸡 6 只，兔 4 只', '鸡 4 只，兔 6 只', '鸡 5 只，兔 5 只', '鸡 7 只，兔 3 只'],
+            answer: 0,
+            explain: '设鸡 x 只、兔 y 只，x + y = 10，2x + 4y = 28，解得 x = 6，y = 4。'
+          },
+          {
+            id: 'math7b4-q8',
+            type: 'judge',
+            stem: '一个二元一次方程有无数个解。',
+            answer: true,
+            explain: '二元一次方程对应一条直线，直线上的点有无数个，所以有无数个解。'
+          }
+        ]
+      },
+      {
+        id: 'math-7b-5',
+        title: '第九章 不等式与不等式组',
+        subtitle: '不等式性质、解集与数轴表示',
+        questions: [
+          {
+            id: 'math7b5-q1',
+            type: 'choice',
+            stem: '不等式两边同时乘以 −2，不等号的方向（　）',
+            options: ['改变', '不变', '一定变成等号', '无法确定'],
+            answer: 0,
+            explain: '不等式两边乘（或除以）同一个负数，不等号方向要改变。'
+          },
+          {
+            id: 'math7b5-q2',
+            type: 'choice',
+            stem: '不等式 2x > 6 的解集是（　）',
+            options: ['x > 3', 'x < 3', 'x > 12', 'x < 12'],
+            answer: 0,
+            explain: '两边同除以 2（正数），不等号方向不变，得 x > 3。'
+          },
+          {
+            id: 'math7b5-q3',
+            type: 'choice',
+            stem: '不等式 −3x < 6 的解集是（　）',
+            options: ['x > −2', 'x < −2', 'x > 2', 'x < 2'],
+            answer: 0,
+            explain: '两边同除以 −3，不等号方向改变，得 x > −2。'
+          },
+          {
+            id: 'math7b5-q4',
+            type: 'judge',
+            stem: '在数轴上表示 x ≥ 2 时，2 对应的点用实心圆点。',
+            answer: true,
+            explain: '含有等号（≥、≤）时用实心圆点，不含等号（>、<）时用空心圆圈。'
+          },
+          {
+            id: 'math7b5-q5',
+            type: 'choice',
+            stem: '不等式组 x > 1，x < 4 的解集是（　）',
+            options: ['1 < x < 4', 'x > 4', 'x < 1', '无解'],
+            answer: 0,
+            explain: '两个解集的公共部分是 1 < x < 4，即“大小小大中间找”。'
+          },
+          {
+            id: 'math7b5-q6',
+            type: 'fill',
+            stem: '不等式 x − 3 < 5 的解集是 x < ____。',
+            accept: ['8'],
+            explain: '移项得 x < 5 + 3，即 x < 8。'
+          },
+          {
+            id: 'math7b5-q7',
+            type: 'choice',
+            stem: '某数的 3 倍不小于 12，用不等式表示并求解，结果是（　）',
+            options: ['x ≥ 4', 'x ≤ 4', 'x > 4', 'x < 4'],
+            answer: 0,
+            explain: '“不小于”即大于或等于，3x ≥ 12，两边除以 3 得 x ≥ 4。'
+          },
+          {
+            id: 'math7b5-q8',
+            type: 'judge',
+            stem: '不等式两边同时加上同一个数，不等号的方向不变。',
+            answer: true,
+            explain: '不等式两边加（或减）同一个数，不等号方向不变；乘除负数才改变方向。'
+          }
+        ]
+      },
+      {
+        id: 'math-7b-6',
+        title: '第十章 数据的收集、整理与描述',
+        subtitle: '全面调查、抽样调查与统计图',
+        questions: [
+          {
+            id: 'math7b6-q1',
+            type: 'choice',
+            stem: '要了解全班同学的身高情况，最适合采用（　）',
+            options: ['全面调查', '抽样调查', '只问几个好朋友', '估计一下'],
+            answer: 0,
+            explain: '班级人数少、范围小，适合全面调查，结果更准确。'
+          },
+          {
+            id: 'math7b6-q2',
+            type: 'choice',
+            stem: '为了解全校 2000 名学生的视力，抽取 200 名学生进行调查，样本是（　）',
+            options: ['抽取的 200 名学生的视力', '全校 2000 名学生', '每一名学生', '200'],
+            answer: 0,
+            explain: '总体是全校学生的视力，样本是抽取的 200 名学生的视力，个体是每名学生的视力。'
+          },
+          {
+            id: 'math7b6-q3',
+            type: 'choice',
+            stem: '能清楚表示各部分占总体的百分比的统计图是（　）',
+            options: ['扇形统计图', '条形统计图', '折线统计图', '频数分布直方图'],
+            answer: 0,
+            explain: '扇形统计图用扇形的大小表示各部分占总体的百分比。'
+          },
+          {
+            id: 'math7b6-q4',
+            type: 'choice',
+            stem: '能直观反映数据变化趋势的统计图是（　）',
+            options: ['折线统计图', '扇形统计图', '条形统计图', '直方图'],
+            answer: 0,
+            explain: '折线统计图能清楚反映数据的变化趋势。'
+          },
+          {
+            id: 'math7b6-q5',
+            type: 'judge',
+            stem: '抽样调查时，样本要具有代表性。',
+            answer: true,
+            explain: '样本要有代表性、随机性，才能较好地反映总体情况。'
+          },
+          {
+            id: 'math7b6-q6',
+            type: 'fill',
+            stem: '抽取 200 名学生进行调查，这次调查的样本容量是 ____。',
+            accept: ['200'],
+            explain: '样本容量是样本中个体的数目，这里是 200。'
+          },
+          {
+            id: 'math7b6-q7',
+            type: 'judge',
+            stem: '条形统计图能清楚地表示出每个项目的具体数目。',
+            answer: true,
+            explain: '条形统计图用直条的高度表示数量，便于比较各项目的具体数目。'
+          },
+          {
+            id: 'math7b6-q8',
+            type: 'choice',
+            stem: '把数据分组后，各组数据的频数用直方图表示，这种图叫（　）',
+            options: ['频数分布直方图', '扇形统计图', '折线统计图', '条形统计图'],
+            answer: 0,
+            explain: '频数分布直方图用来表示分组数据的频数分布情况。'
+          }
+        ]
       }
     ]
   });

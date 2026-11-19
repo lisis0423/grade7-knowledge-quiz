@@ -288,6 +288,421 @@
             explain: 'Excuse me 意为“打扰一下”，用于引起注意、请求帮助或借过。'
           }
         ]
+      },
+      {
+        id: 'eng-7b-1',
+        title: '第五章 情态动词 can',
+        subtitle: '能力、请求与许可',
+        questions: [
+          {
+            id: 'eng7b1-q1',
+            type: 'choice',
+            stem: 'I can ____ the guitar.',
+            options: ['play', 'plays', 'playing', 'played'],
+            answer: 0,
+            explain: '情态动词 can 后面接动词原形，所以用 play。'
+          },
+          {
+            id: 'eng7b1-q2',
+            type: 'choice',
+            stem: '—Can you swim? —Yes, I ____.',
+            options: ['can', 'do', 'am', 'is'],
+            answer: 0,
+            explain: 'Can 引导的一般疑问句，肯定回答用 Yes, I can.，否定回答用 No, I can’t.。'
+          },
+          {
+            id: 'eng7b1-q3',
+            type: 'choice',
+            stem: 'She can ____ English.',
+            options: ['speak', 'speaks', 'speaking', 'spoke'],
+            answer: 0,
+            explain: 'can 后接动词原形，speak English 表示“说英语”。'
+          },
+          {
+            id: 'eng7b1-q4',
+            type: 'judge',
+            stem: '情态动词 can 后面要接动词原形。',
+            answer: true,
+            explain: 'can 没有人称和数的变化，后面一律接动词原形。'
+          },
+          {
+            id: 'eng7b1-q5',
+            type: 'choice',
+            stem: '—What can you do? —____',
+            options: ['I can dance.', 'I am dancing.', 'Yes, I can.', 'I like dancing.'],
+            answer: 0,
+            explain: 'What can you do? 询问能力，回答用 I can + 动词原形。'
+          },
+          {
+            id: 'eng7b1-q6',
+            type: 'fill',
+            stem: 'He can ____ (play) chess.',
+            accept: ['play'],
+            hint: 'can 后面用动词原形',
+            explain: 'can 后接动词原形，所以填 play。'
+          },
+          {
+            id: 'eng7b1-q7',
+            type: 'choice',
+            stem: '想请别人帮忙，可以说（　）',
+            options: ['Can you help me?', 'Can I help you?', 'What can you do?', 'You can help me.'],
+            answer: 0,
+            explain: 'Can you help me? 意为“你能帮我吗？”，用于请求帮助。'
+          },
+          {
+            id: 'eng7b1-q8',
+            type: 'judge',
+            stem: 'Can 引导的一般疑问句，肯定回答用 Yes, I can.。',
+            answer: true,
+            explain: 'Can 问句用 can 回答，Yes, I can. / No, I can’t.。'
+          }
+        ]
+      },
+      {
+        id: 'eng-7b-2',
+        title: '第六章 频度副词与日常作息',
+        subtitle: 'always / usually / sometimes / never 与时间表达',
+        questions: [
+          {
+            id: 'eng7b2-q1',
+            type: 'choice',
+            stem: '—What time do you get up? —____',
+            options: ['At six.', 'On Monday.', 'In the morning.', 'It’s six.'],
+            answer: 0,
+            explain: 'What time 询问具体时间，回答用 at + 时间点。'
+          },
+          {
+            id: 'eng7b2-q2',
+            type: 'choice',
+            stem: 'always 的意思是（　）',
+            options: ['总是', '通常', '有时', '从不'],
+            answer: 0,
+            explain: 'always 总是，usually 通常，sometimes 有时，never 从不。'
+          },
+          {
+            id: 'eng7b2-q3',
+            type: 'choice',
+            stem: 'She usually ____ to school by bike.',
+            options: ['goes', 'go', 'going', 'went'],
+            answer: 0,
+            explain: '一般现在时，主语 She 是第三人称单数，go 变为 goes。'
+          },
+          {
+            id: 'eng7b2-q4',
+            type: 'judge',
+            stem: '频度副词通常放在实义动词之前。',
+            answer: true,
+            explain: '例如 I usually go to school by bus.，usually 放在实义动词 go 前。'
+          },
+          {
+            id: 'eng7b2-q5',
+            type: 'choice',
+            stem: '“我从不迟到”用英语说是（　）',
+            options: ['I am never late.', 'I never am late.', 'I am late never.', 'Never I am late.'],
+            answer: 0,
+            explain: '频度副词放在 be 动词之后，所以是 I am never late.。'
+          },
+          {
+            id: 'eng7b2-q6',
+            type: 'fill',
+            stem: '他从不迟到：He is ____ late.',
+            accept: ['never'],
+            hint: '填一个频度副词',
+            explain: '“从不”是 never，放在 be 动词 is 之后。'
+          },
+          {
+            id: 'eng7b2-q7',
+            type: 'choice',
+            stem: '—What time does he go to bed? —____',
+            options: ['At nine.', 'On Sunday.', 'In the evening.', 'It is nine.'],
+            answer: 0,
+            explain: 'What time does he...? 询问时间，回答用 at + 时间点。'
+          },
+          {
+            id: 'eng7b2-q8',
+            type: 'judge',
+            stem: '“What time”用来询问时间。',
+            answer: true,
+            explain: 'What time 意为“几点”，用于询问具体时间。'
+          }
+        ]
+      },
+      {
+        id: 'eng-7b-3',
+        title: '第七章 现在进行时',
+        subtitle: 'be + 动词-ing 表示正在发生',
+        questions: [
+          {
+            id: 'eng7b3-q1',
+            type: 'choice',
+            stem: 'She is ____ TV now.',
+            options: ['watching', 'watch', 'watches', 'watched'],
+            answer: 0,
+            explain: '现在进行时结构是 be + 动词-ing，She is watching TV now.。'
+          },
+          {
+            id: 'eng7b3-q2',
+            type: 'choice',
+            stem: 'They are ____ football.',
+            options: ['playing', 'play', 'plays', 'played'],
+            answer: 0,
+            explain: 'are 后面接动词-ing，play 变为 playing。'
+          },
+          {
+            id: 'eng7b3-q3',
+            type: 'judge',
+            stem: '现在进行时的结构是“be + 动词-ing”。',
+            answer: true,
+            explain: '现在进行时由 be 动词（am/is/are）加动词的 -ing 形式构成。'
+          },
+          {
+            id: 'eng7b3-q4',
+            type: 'choice',
+            stem: 'I am ____ a book.',
+            options: ['reading', 'read', 'reads', 'readed'],
+            answer: 0,
+            explain: 'am 后面接动词-ing，read 变为 reading。'
+          },
+          {
+            id: 'eng7b3-q5',
+            type: 'choice',
+            stem: '—What are you doing? —____',
+            options: ['I’m doing my homework.', 'I do my homework.', 'I did my homework.', 'Yes, I am.'],
+            answer: 0,
+            explain: 'What are you doing? 询问正在做什么，用现在进行时回答。'
+          },
+          {
+            id: 'eng7b3-q6',
+            type: 'fill',
+            stem: 'Look! The boy is ____ (run).',
+            accept: ['running'],
+            hint: '注意双写末尾字母',
+            explain: 'run 是重读闭音节，双写 n 再加 -ing，变为 running。'
+          },
+          {
+            id: 'eng7b3-q7',
+            type: 'judge',
+            stem: '现在进行时表示说话时正在进行的动作。',
+            answer: true,
+            explain: '现在进行时表示此刻正在发生或进行的动作。'
+          },
+          {
+            id: 'eng7b3-q8',
+            type: 'choice',
+            stem: '动词 run 的 -ing 形式是（　）',
+            options: ['running', 'runing', 'runnning', 'runs'],
+            answer: 0,
+            explain: 'run 末尾是重读闭音节，要双写 n 再加 -ing，所以是 running。'
+          }
+        ]
+      },
+      {
+        id: 'eng-7b-4',
+        title: '第八章 There be 与方位介词',
+        subtitle: '存在句、就近原则与问路',
+        questions: [
+          {
+            id: 'eng7b4-q1',
+            type: 'choice',
+            stem: 'There ____ a book on the desk.',
+            options: ['is', 'are', 'am', 'be'],
+            answer: 0,
+            explain: 'There be 句型中，主语 a book 是单数，用 is。'
+          },
+          {
+            id: 'eng7b4-q2',
+            type: 'choice',
+            stem: 'There ____ two apples in the box.',
+            options: ['are', 'is', 'am', 'be'],
+            answer: 0,
+            explain: '主语 two apples 是复数，There be 用 are。'
+          },
+          {
+            id: 'eng7b4-q3',
+            type: 'judge',
+            stem: 'There be 句型遵循“就近原则”，be 动词与最近的主语保持一致。',
+            answer: true,
+            explain: '例如 There is a pen and two books.，be 动词与最近的 a pen 一致。'
+          },
+          {
+            id: 'eng7b4-q4',
+            type: 'choice',
+            stem: 'The bank is ____ the post office.',
+            options: ['next to', 'next', 'near to', 'beside of'],
+            answer: 0,
+            explain: 'next to 表示“紧挨着、在……旁边”。'
+          },
+          {
+            id: 'eng7b4-q5',
+            type: 'choice',
+            stem: '—Is there a park near here? —____',
+            options: ['Yes, there is.', 'Yes, it is.', 'Yes, there are.', 'Yes, I am.'],
+            answer: 0,
+            explain: 'Is there...? 的肯定回答是 Yes, there is.，否定回答是 No, there isn’t.。'
+          },
+          {
+            id: 'eng7b4-q6',
+            type: 'fill',
+            stem: '在……对面：____ from',
+            accept: ['across'],
+            hint: '填一个介词',
+            explain: 'across from 表示“在……对面”，如 across from the bank。'
+          },
+          {
+            id: 'eng7b4-q7',
+            type: 'judge',
+            stem: 'between 表示“在两者之间”。',
+            answer: true,
+            explain: 'between 通常用于两者之间，among 用于三者或三者以上之间。'
+          },
+          {
+            id: 'eng7b4-q8',
+            type: 'choice',
+            stem: '向别人问路，可以说（　）',
+            options: ['How can I get to the library?', 'Where is the library?', 'What is the library?', 'How is the library?'],
+            answer: 0,
+            explain: 'How can I get to...? 是问路的常用句型；Where is...? 也可以，但选项里 A 最完整。'
+          }
+        ]
+      },
+      {
+        id: 'eng-7b-5',
+        title: '第九章 一般过去时',
+        subtitle: '规则与不规则动词的过去式',
+        questions: [
+          {
+            id: 'eng7b5-q1',
+            type: 'choice',
+            stem: 'I ____ to the zoo yesterday.',
+            options: ['went', 'go', 'goes', 'going'],
+            answer: 0,
+            explain: 'yesterday 表示过去，用一般过去时，go 的过去式是 went。'
+          },
+          {
+            id: 'eng7b5-q2',
+            type: 'choice',
+            stem: 'She ____ her homework last night.',
+            options: ['did', 'does', 'do', 'doing'],
+            answer: 0,
+            explain: 'last night 表示过去，do 的过去式是 did。'
+          },
+          {
+            id: 'eng7b5-q3',
+            type: 'judge',
+            stem: '一般过去时表示过去某个时间发生的动作或存在的状态。',
+            answer: true,
+            explain: '一般过去时常与 yesterday、last night、two days ago 等时间状语连用。'
+          },
+          {
+            id: 'eng7b5-q4',
+            type: 'choice',
+            stem: 'They ____ happy at the party.',
+            options: ['were', 'was', 'are', 'is'],
+            answer: 0,
+            explain: '主语 They 是复数，be 动词的过去式用 were。'
+          },
+          {
+            id: 'eng7b5-q5',
+            type: 'choice',
+            stem: 'He ____ basketball yesterday.',
+            options: ['played', 'plays', 'play', 'playing'],
+            answer: 0,
+            explain: 'yesterday 表示过去，play 是规则动词，过去式加 -ed 变为 played。'
+          },
+          {
+            id: 'eng7b5-q6',
+            type: 'fill',
+            stem: 'go 的过去式是 ____。',
+            accept: ['went'],
+            hint: '不规则动词',
+            explain: 'go 是不规则动词，过去式是 went。'
+          },
+          {
+            id: 'eng7b5-q7',
+            type: 'choice',
+            stem: '—Did you watch TV last night? —____',
+            options: ['Yes, I did.', 'Yes, I do.', 'Yes, I was.', 'Yes, I am.'],
+            answer: 0,
+            explain: 'Did 引导的一般疑问句，肯定回答用 Yes, I did.，否定回答用 No, I didn’t.。'
+          },
+          {
+            id: 'eng7b5-q8',
+            type: 'judge',
+            stem: '规则动词的过去式一般在词尾加 -ed。',
+            answer: true,
+            explain: '如 play→played，watch→watched；以 e 结尾加 -d，如 like→liked。'
+          }
+        ]
+      },
+      {
+        id: 'eng-7b-6',
+        title: '第十章 情景交际',
+        subtitle: '天气、外貌、购物、问路与电话',
+        questions: [
+          {
+            id: 'eng7b6-q1',
+            type: 'choice',
+            stem: '询问天气，可以说（　）',
+            options: ['What’s the weather like?', 'What’s the time?', 'What’s your name?', 'How old are you?'],
+            answer: 0,
+            explain: 'What’s the weather like? 意为“天气怎么样？”，也可以说 How’s the weather?。'
+          },
+          {
+            id: 'eng7b6-q2',
+            type: 'choice',
+            stem: '询问某人的外貌，可以说（　）',
+            options: ['What does he look like?', 'What does he like?', 'How does he feel?', 'What is he doing?'],
+            answer: 0,
+            explain: 'What does he look like? 询问外貌；What does he like? 询问喜好。'
+          },
+          {
+            id: 'eng7b6-q3',
+            type: 'choice',
+            stem: '购物时询问价格，可以说（　）',
+            options: ['How much is it?', 'How many is it?', 'How old is it?', 'How is it?'],
+            answer: 0,
+            explain: 'How much 询问价格或不可数名词的数量；How many 询问可数名词数量。'
+          },
+          {
+            id: 'eng7b6-q4',
+            type: 'choice',
+            stem: '给别人指路，可以说（　）',
+            options: ['Go along this street.', 'How are you?', 'Nice to meet you.', 'What’s this?'],
+            answer: 0,
+            explain: 'Go along this street. 意为“沿着这条街走”，是常见的指路用语。'
+          },
+          {
+            id: 'eng7b6-q5',
+            type: 'judge',
+            stem: '点餐时可以说“I’d like some noodles.”。',
+            answer: true,
+            explain: 'I’d like... 是“我想要……”的意思，常用于点餐或提出请求。'
+          },
+          {
+            id: 'eng7b6-q6',
+            type: 'fill',
+            stem: '别人说 Thank you，你可以回答：You’re ____.',
+            accept: ['welcome'],
+            hint: '填一个单词',
+            explain: 'You’re welcome. 意为“不客气”，是对感谢的常见回答。'
+          },
+          {
+            id: 'eng7b6-q7',
+            type: 'choice',
+            stem: '邀请别人，可以说（　）',
+            options: ['Would you like to come to my party?', 'Do you like my party?', 'Did you come to my party?', 'Are you my party?'],
+            answer: 0,
+            explain: 'Would you like to...? 用于礼貌地邀请别人。'
+          },
+          {
+            id: 'eng7b6-q8',
+            type: 'choice',
+            stem: '接电话时介绍自己，可以说（　）',
+            options: ['This is Tom speaking.', 'I am Tom speaking.', 'That is Tom.', 'Tom is speaking me.'],
+            answer: 0,
+            explain: '电话用语中常用 This is... speaking. 介绍自己。'
+          }
+        ]
       }
     ]
   });

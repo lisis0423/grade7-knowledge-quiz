@@ -47,7 +47,7 @@ if (git status --porcelain) {
 # --- 2. 远端 ------------------------------------------------------------
 $previous = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
-$existingUrl = (git remote get-url $remoteName 2>$null)
+$existingUrl = git config --get "remote.$remoteName.url"
 $ErrorActionPreference = $previous
 if (-not $existingUrl) {
     Write-Step "添加远端 $remoteName ..."

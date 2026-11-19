@@ -18,8 +18,8 @@ function Write-Hint($text) { Write-Host $text -ForegroundColor DarkGray }
 if (-not $User) {
     Write-Host ""
     Write-Host "AtomGit 用户名（例如 lisis0423，直接回车用默认值）:" -ForegroundColor Yellow
-    $input = Read-Host "用户名"
-    if ($input) { $User = $input.Trim() } else { $User = 'lisis0423' }
+    $typed = Read-Host "用户名"
+    if ($typed) { $User = $typed.Trim() } else { $User = 'lisis0423' }
 }
 
 $remoteName = 'atomgit'

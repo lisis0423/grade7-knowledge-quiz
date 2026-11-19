@@ -47,11 +47,34 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host ""
     Write-Host "Push failed." -ForegroundColor Red
     Write-Host ""
-    Write-Host "Most likely the repository does not exist yet. Create an EMPTY public repository:"
-    Write-Host "  https://github.com/new?name=$repo&visibility=public"
-    Write-Host ""
-    Write-Host "Important: do NOT tick 'Add a README', '.gitignore' or 'license'."
-    Write-Host "Then run this script again."
+
+    # 先判断是「仓库不存在」还是「网络问题」。网络问题在国内网络环境很常见，
+    # 尤其是 Recv failure / Connection was reset，重试或换网络通常就能通过。
+    $remoteHeads = git ls-remote --heads origin main 2>$null
+    if ($LASTEXITCODE -ne 0 -or -not $remoteHeads) {
+        Write-Host "The repository cannot be reached. Two common causes:"
+        Write-Host ""
+        Write-Host "  1) The repository does not exist yet. Create an EMPTY public repository:"
+        Write-Host "     https://github.com/new?name=$repo&visibility=public"
+        Write-Host "     Important: do NOT tick 'Add a README', '.gitignore' or 'license'."
+        Write-Host ""
+        Write-Host "  2) The network to github.com is blocked or unstable."
+        Write-Host "     Messages like 'Recv failure' or 'Connection was reset' mean this."
+        Write-Host "     Try again, switch network (mobile hotspot), or enable a proxy/VPN."
+    } else {
+        $remoteSha = ($remoteHeads -split "\s+")[0]
+        $localSha = git rev-parse HEAD
+        if ($remoteSha -eq $localSha) {
+            Write-Host "Nothing to push: GitHub already has this exact version." -ForegroundColor Green
+            Write-Host "The connection error above is harmless; the site is already up to date:"
+            Write-Host "  $pagesUrl" -ForegroundColor Green
+        } else {
+            Write-Host "The repository exists, but the network to github.com dropped."
+            Write-Host "GitHub has: $($remoteSha.Substring(0,7))   Local has: $($localSha.Substring(0,7))"
+            Write-Host ""
+            Write-Host "Try again, switch network (mobile hotspot), or enable a proxy/VPN."
+        }
+    }
     Write-Host ""
     Read-Host "Press Enter to exit"
     exit 1

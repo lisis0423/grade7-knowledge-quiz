@@ -1,4 +1,4 @@
-# Publish this project to GitHub Pages
+﻿# Publish this project to GitHub Pages
 # Double-click publish-github.bat instead of running this file directly.
 
 $ErrorActionPreference = 'Stop'

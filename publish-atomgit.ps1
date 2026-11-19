@@ -57,7 +57,7 @@ if ($remotes -notcontains $remoteName) {
 Write-Step "检查 AtomGit 上的仓库..."
 $previous = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
-$probe = git ls-remote --heads $remoteName 2>&1
+$probe = git -c credential.helper= ls-remote --heads $remoteName 2>&1
 $probeOk = ($LASTEXITCODE -eq 0)
 $ErrorActionPreference = $previous
 if (-not $probeOk) {

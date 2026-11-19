@@ -36,12 +36,16 @@ const SCRIPTS = [
 let pass = 0;
 let fail = 0;
 
+const failures = [];
+
 function check(name, cond, extra) {
   if (cond) {
     pass += 1;
     console.log('  ✔ ' + name);
   } else {
     fail += 1;
+    failures.push(name + (extra !== undefined ? '  → ' + extra : ''));
+    fs.writeFileSync(path.join(__dirname, 'e2e-failures.txt'), failures.join('\n') + '\n', 'utf8');
     console.log('  ✘ ' + name + (extra !== undefined ? '  → ' + extra : ''));
   }
 }
@@ -185,13 +189,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   check('角色卡出现', !!$('.agent-card'));
   check('初始等级 Lv.1', txt($('.agent-lv')) === 'Lv.1', txt($('.agent-lv')));
   check('装备舱入口存在', !!$('#toBag'));
-  check('显示 47 个任务', txt($('.hero-stats')).indexOf('0/47') !== -1, txt($('.hero-stats')));
+  check('显示 71 个任务', txt($('.hero-stats')).indexOf('0/71') !== -1, txt($('.hero-stats')));
   check('数学 10 关', w.GameSubjects.get('math').levels.length === 10);
-  check('语文 4 关', w.GameSubjects.get('chinese').levels.length === 4);
+  check('语文 10 关', w.GameSubjects.get('chinese').levels.length === 10);
   check('英语 10 关', w.GameSubjects.get('english').levels.length === 10);
-  check('生物 4 关', w.GameSubjects.get('biology').levels.length === 4);
-  check('历史 4 关', w.GameSubjects.get('history').levels.length === 4);
-  check('道法 4 关', w.GameSubjects.get('politics').levels.length === 4);
+  check('生物 10 关', w.GameSubjects.get('biology').levels.length === 10);
+  check('历史 10 关', w.GameSubjects.get('history').levels.length === 10);
+  check('道法 10 关', w.GameSubjects.get('politics').levels.length === 10);
 
   /* ---------- 2. 任务列表 / 简报 / 难度 ---------- */
   console.log('\n[2] 任务简报与三档难度');
@@ -287,7 +291,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   console.log('\n[5] 答错、督察追问与错题重练');
   await go('#/play/geography/geo-7a-2/agent');
   const firstQ = findQuestion();
-  const wrongOption = $$('.option').find((b) => txt(b.querySelector('.opt-text')) !== firstQ.options[firstQ.answer]);
+  const wrongOption = firstQ.type === 'judge'
+    ? $$('.option').find((b) => b.getAttribute('data-value') === String(!firstQ.answer))
+    : $$('.option').find((b) => txt(b.querySelector('.opt-text')) !== firstQ.options[firstQ.answer]);
   await click(wrongOption, 30);
   check('错误反馈出现', !!$('.qfeedback.bad'));
   check('扣分提示出现', !!$('.fb-penalty'));
@@ -463,8 +469,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   check('报告显示等级', txt($('#view')).indexOf('Lv.') !== -1);
 
   await go('#/');
-  check('首页星星 5/141', txt($('.hero-stats')).indexOf('5/141') !== -1, txt($('.hero-stats')));
-  check('首页已挑战 2 个任务', txt($('.hero-stats')).indexOf('2/47') !== -1, txt($('.hero-stats')));
+  check('首页星星 5/213', txt($('.hero-stats')).indexOf('5/213') !== -1, txt($('.hero-stats')));
+  check('首页已挑战 2 个任务', txt($('.hero-stats')).indexOf('2/71') !== -1, txt($('.hero-stats')));
   check('角色卡等级已提升', txt($('.agent-lv')) !== 'Lv.1', txt($('.agent-lv')));
   check('角色卡显示金币', txt($('.agent-meta')).indexOf('🪙') !== -1);
 
@@ -472,11 +478,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   console.log('\n[10] 六科任务');
   const extraSubjects = [
     ['math', '数学任务 01', 10],
-    ['chinese', '语文任务 01', 4],
+    ['chinese', '语文任务 01', 10],
     ['english', '英语任务 01', 10],
-    ['biology', '生物任务 01', 4],
-    ['history', '历史任务 01', 4],
-    ['politics', '道法任务 01', 4]
+    ['biology', '生物任务 01', 10],
+    ['history', '历史任务 01', 10],
+    ['politics', '道法任务 01', 10]
   ];
   for (const [sid, code, count] of extraSubjects) {
     await go('#/subject/' + sid);

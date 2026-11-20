@@ -56,6 +56,7 @@ foreach ($t in $targets) {
 
     if (-not $probeOk) {
         Write-Host "$name 上还没有这个仓库，或当前网络访问不到。" -ForegroundColor Yellow
+        Write-Host "  如果是 Connection reset / 超时，就是网络问题，重试或换网络（手机热点）。" -ForegroundColor DarkGray
         Write-Host "  建空仓库（不要勾初始化 README）：$($t.createUrl)"
         $report += "$name : 跳过（仓库不存在或网络不通）"
         continue

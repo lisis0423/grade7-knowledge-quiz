@@ -231,16 +231,28 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const setAgent = w.GameRPG.buildQuestionSet('geography', 'geo-7a-1', 'agent');
   const setLegend = w.GameRPG.buildQuestionSet('geography', 'geo-7a-1', 'legend');
   check('基础档 6 题', setRookie.questions.length === 6, setRookie.questions.length);
-  check('中级档 10 题', setAgent.questions.length === 10, setAgent.questions.length);
-  check('高级档在没有已学章节时只考本关', setLegend.questions.length === 10 && setLegend.extraCount === 0,
+  check('中级档 6 题', setAgent.questions.length === 6, setAgent.questions.length);
+  check('高级档在没有已学章节时只考本关', setLegend.questions.length === 8 && setLegend.extraCount === 0,
     setLegend.questions.length + '/' + setLegend.extraCount);
   check('基础档题目全是选择/判断',
     setRookie.questions.every((q) => q.type === 'choice' || q.type === 'judge'));
+  check('基础档不出现难题',
+    setRookie.questions.every((q) => w.GameRPG.levelOf(q) <= 2),
+    setRookie.questions.map((q) => w.GameRPG.levelOf(q)).join(''));
+
+  const hardIds = w.GameSubjects.level('geography', 'geo-7a-1').questions
+    .filter((q) => w.GameRPG.levelOf(q) === 3).map((q) => q.id);
+  check('高级档覆盖本关所有难题',
+    hardIds.every((id) => setLegend.questions.some((q) => q.id === id)), hardIds.length);
+
+  const rookieIds = new Set(setRookie.questions.map((q) => q.id));
+  const rookieAgentOverlap = setAgent.questions.filter((q) => rookieIds.has(q.id)).length;
+  check('基础与中级题目不是同一套', rookieAgentOverlap < 6, rookieAgentOverlap);
 
   w.GameStore.recordMission('geo-7a-1', 'agent', { score: 100, stars: 2 });
   const setLegend2 = w.GameRPG.buildQuestionSet('geography', 'geo-7a-2', 'legend');
   check('高级档会加入已学章节的跨区题',
-    setLegend2.questions.length === 13 && setLegend2.extraCount === 3,
+    setLegend2.questions.length === 11 && setLegend2.extraCount === 3,
     setLegend2.questions.length + '/' + setLegend2.extraCount);
 
   let dupLevel = '';
@@ -290,21 +302,21 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await click(btn, 80);
   }
 
-  check('答满 10 题', answered === 10, answered);
+  check('答满 6 题', answered === 6, answered);
   check('出现连击宝箱', chestSeen === true);
   check('进入任务报告', w.location.hash === '#/result', w.location.hash);
   await sleep(120);
   check('报告卡片出现', !!$('.result-card'));
   check('评级为 S', txt($('.rank-badge')) === 'S', txt($('.rank-badge')));
   check('三颗星', $$('.big-stars .on').length === 3);
-  check('得分 1700', txt($$('.result-grid b')[0]) === '1700', txt($$('.result-grid b')[0]));
-  check('答对 10/10', txt($$('.result-grid b')[1]) === '10/10', txt($$('.result-grid b')[1]));
-  check('最高连击 ×10', txt($$('.result-grid b')[3]) === '×10', txt($$('.result-grid b')[3]));
+  check('得分 900', txt($$('.result-grid b')[0]) === '900', txt($$('.result-grid b')[0]));
+  check('答对 6/6', txt($$('.result-grid b')[1]) === '6/6', txt($$('.result-grid b')[1]));
+  check('最高连击 ×6', txt($$('.result-grid b')[3]) === '×6', txt($$('.result-grid b')[3]));
   check('显示任务奖金', !!$('.reward-panel'));
   check('金币已入账', w.GameStore.getProfile().coins >= 130, w.GameStore.getProfile().coins);
   check('经验已入账并升级', w.GameStore.getProfile().level >= 2, w.GameStore.getProfile().level);
-  check('成绩写入旧统计', w.GameStore.levelProgress('geography', 'geo-7a-1').best === 1700);
-  check('今日情报量 10', w.GameStore.todayCount() === 10);
+  check('成绩写入旧统计', w.GameStore.levelProgress('geography', 'geo-7a-1').best === 900);
+  check('今日情报量 6', w.GameStore.todayCount() === 6);
   check('有再闯一次按钮', !!$('#againBtn'));
   check('有换难度按钮', !!$('#changeDiff'));
 
@@ -331,10 +343,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await clearChestIfAny();
     await click($('#primaryBtn'), 80);
   }
-  check('第二章答完 10 题', n === 10, n);
+  check('第二章答完 6 题', n === 6, n);
   check('报告列出本次漏洞', $$('.review-item').length === 1, $$('.review-item').length);
   check('有重练按钮', !!$('#practiceWrong'));
-  check('正确率 90% 对应 2 星', $$('.big-stars .on').length === 2, $$('.big-stars .on').length);
+  check('错一题是 83%，对应 2 星', $$('.big-stars .on').length === 2, $$('.big-stars .on').length);
 
   await click($('#practiceWrong'), 120);
   check('进入错题重练', w.location.hash === '#/review/geography', w.location.hash);
@@ -488,7 +500,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   console.log('\n[8] 学习报告与基地状态');
   await go('#/stats');
   check('8 个统计块', $$('.stat-box').length === 8, $$('.stat-box').length);
-  check('累计答题 20', txt($$('.stat-box b')[0]) === '20', txt($$('.stat-box b')[0]));
+  check('累计答题 12', txt($$('.stat-box b')[0]) === '12', txt($$('.stat-box b')[0]));
   check('报告显示等级', txt($('#view')).indexOf('Lv.') !== -1);
 
   await go('#/');

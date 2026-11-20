@@ -1490,3 +1490,5 @@ main { padding-bottom: 8px; }
 .map-tab[disabled] { opacity: .45; cursor: default; }
 .kp-go { padding: 0 12px 12px; }
 .kp-go .btn { font-size: .78rem; }
+
+.dc-count { display: block; margin-top: 6px; font-size: .72rem; color: #4d7a6b; font-weight: 700; }

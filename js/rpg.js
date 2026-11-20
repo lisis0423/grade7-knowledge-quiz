@@ -10,26 +10,38 @@
   var DIFFS = {
     rookie: {
       key: 'rookie', name: '基础', icon: '🌱', tag: '轻松复习',
-      desc: '6 道基础题 · 不限时 · 答错可再答一次',
-      pick: 6, timeLimit: 0, penalty: 0, retry: 1,
+      desc: '6 道最基础的题 · 不限时 · 答错可再答一次',
+      pick: 6, order: [1, 2], timeLimit: 0, penalty: 0, retry: 1,
       coinRate: 1, expRate: 1, drop: 0.45,
       starLine: [0.5, 0.7, 0.9]
     },
     agent: {
       key: 'agent', name: '中级', icon: '🛰️', tag: '标准任务',
-      desc: '全部题目 · 不限时 · 答错扣 20 分',
-      pick: 0, timeLimit: 0, penalty: 20, retry: 0,
+      desc: '6 道中等题（不够从已学章节补）· 不限时 · 答错扣 20 分',
+      pick: 6, order: [2, 1], cross: true, timeLimit: 0, penalty: 20, retry: 0,
       coinRate: 1.3, expRate: 1.2, drop: 0.7,
       starLine: [0.6, 0.8, 0.95]
     },
     legend: {
       key: 'legend', name: '高级', icon: '🔥', tag: '督察突袭',
-      desc: '全部题目 + 3 道跨区题 · 每题 15 秒 · 答错扣 80 分 · 三星需全对',
-      pick: 0, timeLimit: 15, penalty: 80, retry: 0,
+      desc: '8 道难题（含已学章节）+ 3 道跨区题 · 每题 15 秒 · 答错扣 80 分 · 三星需全对',
+      pick: 8, order: [3, 2], cross: true, baseCap: 4, timeLimit: 15, penalty: 80, retry: 0,
       coinRate: 2.1, expRate: 1.8, drop: 1, extra: 3,
       starLine: [0.85, 0.95, 1]
     }
   };
+
+  /* 题目难度：3 难 / 2 中等 / 1 基础。题库里写了 lv 就用 lv，否则按题型和题干推断 */
+  function levelOf(q) {
+    if (!q) return 2;
+    if (q.lv === 1 || q.lv === 2 || q.lv === 3) return q.lv;
+    if (q.type === 'fill' || q.type === 'match') return 3;
+    if (q.type === 'judge') return 1;
+    var s = String(q.stem || '');
+    if (/不包括|不属于|错误的是|有误|排序|正确顺序|为什么|原因|分析|说明|比较|判断下列/.test(s)) return 3;
+    if (s.length > 28) return 2;
+    return s.length <= 14 ? 1 : 2;
+  }
 
   /* 宝箱等级：白 普通 / 绿 精良 / 蓝 稀有 / 黄 传说 / 红 神话 */
   var CHEST_TIERS = [
@@ -114,54 +126,84 @@
     return out;
   }
 
+  /* 按难度顺序取题：每一层先取本关，再取已学章节；不够再放宽 */
+  function pickByLevels(base, cross, order, count, capBase) {
+    var out = [];
+    var taken = {};
+    var need = count || 0;
+    var fromBase = 0;
+
+    function takeFrom(list, lv, isBase) {
+      shuffle(list).forEach(function (q) {
+        if (need && out.length >= need) return;
+        if (capBase && isBase && fromBase >= capBase) return;
+        if (taken[q.id]) return;
+        if (levelOf(q) === lv) {
+          out.push(q); taken[q.id] = true;
+          if (isBase) fromBase += 1;
+        }
+      });
+    }
+
+    order.forEach(function (lv) {
+      if (need && out.length >= need) return;
+      takeFrom(base, lv, true);
+      takeFrom(cross, lv, false);
+    });
+
+    if (need && out.length < need) {
+      [base, cross].forEach(function (src) {
+        shuffle(src).forEach(function (q) {
+          if (out.length >= need) return;
+          if (taken[q.id]) return;
+          out.push(q); taken[q.id] = true;
+        });
+      });
+    }
+
+    return out;
+  }
+
+  /* 可用的跨区题：只从已挑战过的任务、或当前任务之前的任务里取 */
+  function crossPool(subjectId, levelId) {
+    var allLevels = GameSubjects.levels(subjectId);
+    var currentIndex = -1;
+    allLevels.forEach(function (lv, idx) {
+      if (lv.id === levelId) currentIndex = idx;
+    });
+    var seen = (GameStore.getProfile().missions) || {};
+    var pool = [];
+    allLevels.forEach(function (lv, idx) {
+      if (lv.id === levelId) return;
+      var practiced = seen[lv.id] && Object.keys(seen[lv.id]).length > 0;
+      if (practiced || idx < currentIndex) {
+        lv.questions.forEach(function (q) { pool.push(q); });
+      }
+    });
+    return uniqueQuestions(pool);
+  }
+
   /**
-   * 按难度组装本关题目。
-   * rookie：优先选题干较短的选择/判断题，共 6 道
-   * agent：本关全部题目
-   * legend：本关全部 + 其他关随机 3 道跨区题
+   * 按难度组装本关题目，三档的题目集合刻意错开：
+   * rookie：只在本关挑最基础的 6 道
+   * agent：本关中等题优先，不够就从已学章节补中等题，共 6 道
+   * legend：本关与已学章节的难题优先，凑 8 道，再追加 3 道跨区题
    * 无论哪档，同一局里不会出现 id 或题干重复的题目。
    */
   function buildQuestionSet(subjectId, levelId, diffKey) {
     var level = GameSubjects.level(subjectId, levelId);
     if (!level) return { questions: [], extraCount: 0, diff: getDifficulty(diffKey) };
     var diff = getDifficulty(diffKey);
-    var all = uniqueQuestions(level.questions.slice());
-    var picked;
-
-    if (diff.pick && all.length > diff.pick) {
-      var easyIds = {};
-      var easy = shuffle(all.filter(function (q) {
-        return q.type === 'choice' || q.type === 'judge';
-      }));
-      picked = easy.slice(0, diff.pick);
-      picked.forEach(function (q) { easyIds[q.id] = true; });
-      if (picked.length < diff.pick) {
-        var rest = shuffle(all.filter(function (q) { return !easyIds[q.id]; }));
-        picked = picked.concat(rest.slice(0, diff.pick - picked.length));
-      }
-    } else {
-      picked = shuffle(all);
-    }
+    var base = uniqueQuestions(level.questions.slice());
+    var cross = diff.cross ? crossPool(subjectId, levelId) : [];
+    var picked = pickByLevels(base, cross, diff.order || [1, 2, 3], diff.pick || (base.length + cross.length), diff.baseCap || 0);
 
     var extra = [];
     if (diff.extra) {
-      // 跨区题只从“已挑战过的任务”或“当前任务之前的任务”里抽，
-      // 避免第一次玩就抽到后面还没学的章节。
-      var allLevels = GameSubjects.levels(subjectId);
-      var currentIndex = -1;
-      allLevels.forEach(function (lv, idx) {
-        if (lv.id === levelId) currentIndex = idx;
-      });
-      var seen = (GameStore.getProfile().missions) || {};
-      var pool = [];
-      allLevels.forEach(function (lv, idx) {
-        if (lv.id === levelId) return;
-        var practiced = seen[lv.id] && Object.keys(seen[lv.id]).length > 0;
-        if (practiced || idx < currentIndex) {
-          lv.questions.forEach(function (q) { pool.push(q); });
-        }
-      });
-      extra = uniqueQuestions(shuffle(pool)).slice(0, diff.extra);
+      var pickedIds = {};
+      picked.forEach(function (q) { pickedIds[q.id] = true; });
+      var rest = cross.filter(function (q) { return !pickedIds[q.id]; });
+      extra = pickByLevels([], rest, [3, 2, 1], diff.extra);
     }
 
     var merged = uniqueQuestions(picked.concat(extra));
@@ -312,6 +354,7 @@
     chestTierInfo: chestTierInfo,
     rollChestTier: rollChestTier,
     buildQuestionSet: buildQuestionSet,
+    levelOf: levelOf,
     starsFor: starsFor,
     rankFor: rankFor,
     rewardFor: rewardFor,

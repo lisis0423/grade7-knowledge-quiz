@@ -627,11 +627,14 @@
     var best = GameStore.bestMissionStars(levelId);
 
     var diffCards = GameRPG.difficultyList().map(function (d) {
+      var picked = GameRPG.buildQuestionSet(subjectId, levelId, d.key).questions;
+      var hardCount = picked.filter(function (q) { return GameRPG.levelOf(q) === 3; }).length;
       return '<button class="diff-card' + (d.key === selectedDiff ? ' selected' : '') +
         '" type="button" data-diff="' + d.key + '">' +
         '<span class="dc-head"><span class="dc-icon">' + d.icon + '</span>' +
         '<b>' + d.name + '</b><span class="dc-tag">' + d.tag + '</span></span>' +
         '<span class="dc-desc">' + esc(d.desc) + '</span>' +
+        '<span class="dc-count">本档 ' + picked.length + ' 题 · 难题 ' + hardCount + ' 道</span>' +
         '<span class="dc-rate">奖金 ×' + d.coinRate + ' · 经验 ×' + d.expRate + '</span>' +
         '</button>';
     }).join('');

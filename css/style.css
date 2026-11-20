@@ -1026,6 +1026,8 @@ main { padding-bottom: 8px; }
   animation: fade .18s ease;
 }
 .chest-box {
+  position: relative;
+  isolation: isolate;
   width: 100%;
   max-width: 430px;
   max-height: 92dvh;
@@ -1042,8 +1044,39 @@ main { padding-bottom: 8px; }
   from { opacity: 0; transform: scale(.82) translateY(18px); }
   to { opacity: 1; transform: none; }
 }
-.chest-orb { font-size: 3rem; line-height: 1; animation: bob 1.6s ease-in-out infinite; }
-@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+
+/* 宝箱光效：白光普通 / 绿光精良 / 蓝光稀有 / 黄光传说 / 红光神话 */
+.chest-halo {
+  position: absolute;
+  inset: -34% -12%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%, var(--glow-soft, rgba(255,255,255,.5)), transparent 64%);
+  filter: blur(16px);
+  pointer-events: none;
+  animation: haloPulse 3.4s ease-in-out infinite;
+}
+@keyframes haloPulse {
+  0%, 100% { opacity: .6; transform: scale(.96); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+.chest-box[class*="chest-r"] { border: 1px solid var(--glow, #fff); }
+.chest-r1 { box-shadow: 0 0 0 1px rgba(255,255,255,.18), 0 0 26px -10px var(--glow), 0 30px 60px -18px rgba(0,0,0,.75); }
+.chest-r2 { box-shadow: 0 0 0 1px rgba(67,214,138,.28), 0 0 34px -8px var(--glow), 0 30px 60px -18px rgba(0,0,0,.75); }
+.chest-r3 { box-shadow: 0 0 0 1px rgba(74,157,248,.34), 0 0 44px -8px var(--glow), 0 30px 60px -18px rgba(0,0,0,.75); }
+.chest-r4 { box-shadow: 0 0 0 1px rgba(247,199,68,.42), 0 0 56px -8px var(--glow), 0 30px 60px -18px rgba(0,0,0,.75); }
+.chest-r5 { box-shadow: 0 0 0 1px rgba(255,77,77,.5), 0 0 72px -6px var(--glow), 0 30px 60px -18px rgba(0,0,0,.75); }
+.chest-orb {
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 14px var(--glow, #fff));
+}
+.chest-rarity {
+  margin-right: 6px;
+  color: var(--glow, #fff);
+  text-shadow: 0 0 12px var(--glow, #fff);
+}
+.chest-r5 .chest-rarity { letter-spacing: 1px; }
 .chest-box h2 { margin-top: 8px; font-size: 1.2rem; }
 .chest-sub { margin-top: 4px; font-size: .78rem; color: #9fb8cc; }
 .chest-q {
@@ -1432,3 +1465,28 @@ main { padding-bottom: 8px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+/* ---------- 装扮与装备立绘 ---------- */
+.av-art { display: block; flex: none; }
+.av-figure { display: block; overflow: visible; }
+.agent-avatar { width: 62px; height: 64px; border-radius: 16px; overflow: hidden; }
+.agent-avatar .av-figure { width: 60px; height: auto; }
+.slot-item { align-items: center; }
+.slot-item .av-art { margin: 0 auto; }
+.slot-empty { display: flex; align-items: center; gap: 5px; }
+.bi-icon { display: grid; place-items: center; }
+.item-chip { display: inline-flex; align-items: center; gap: 4px; }
+.bag-preview { display: flex; gap: 14px; align-items: center; padding: 12px; margin-bottom: 12px; border-radius: 18px; background: linear-gradient(150deg, #0f2438, #17334b); color: #eaf3ff; }
+.bp-stage { flex: none; display: grid; place-items: center; width: 128px; }
+.bp-tip { display: flex; flex-direction: column; gap: 4px; font-size: .78rem; color: #a9c2d6; }
+.bp-tip b { color: #fff; font-size: .92rem; }
+.bp-slots { display: flex; gap: 6px; margin-top: 4px; }
+.bp-slot { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px; background: rgba(255,255,255,.07); border: 1px dashed rgba(255,255,255,.18); }
+.bp-slot.on { border-style: solid; border-color: rgba(111,227,192,.6); background: rgba(111,227,192,.12); }
+
+/* ---------- 地图分栏 ---------- */
+.map-tabs { display: flex; gap: 8px; margin: 0 0 10px; }
+.map-tab { padding: 7px 14px; border-radius: 99px; border: 1px solid rgba(31,111,92,.28); background: #fff; color: #1f6f5c; font: inherit; font-size: .84rem; cursor: pointer; }
+.map-tab.on { background: #1f6f5c; color: #fff; border-color: #1f6f5c; }
+.map-tab[disabled] { opacity: .45; cursor: default; }
+.kp-go { padding: 0 12px 12px; }
+.kp-go .btn { font-size: .78rem; }

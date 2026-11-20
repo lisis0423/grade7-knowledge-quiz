@@ -96,7 +96,7 @@
 
   function itemChip(item) {
     if (!item) return '';
-    return '<span class="item-chip r' + item.rarity + '">' + item.icon + ' ' + esc(item.name) + '</span>';
+    return '<span class="item-chip r' + item.rarity + '">' + GameAvatar.art(item, 18) + ' ' + esc(item.name) + '</span>';
   }
 
   function effectsSummary(effects) {
@@ -257,9 +257,9 @@
     var need = GameStore.expNeeded(p.level);
     var pct = Math.min(100, Math.round((p.exp || 0) / need * 100));
     var gear = GameRPG.equippedList(p).filter(function (x) { return x.item; })
-      .map(function (x) { return x.item.icon; }).join(' ');
+      .map(function (x) { return GameAvatar.art(x.item, 20); }).join('');
     return '<section class="agent-card">' +
-      '<div class="agent-avatar">👽<span class="agent-lv">Lv.' + p.level + '</span></div>' +
+      '<div class="agent-avatar">' + GameAvatar.figure(p, 54) + '<span class="agent-lv">Lv.' + p.level + '</span></div>' +
       '<div class="agent-main">' +
         '<div class="agent-top"><b>K-7</b><span class="agent-title">' + esc(GameRPG.levelTitle(p.level)) + '</span></div>' +
         '<div class="exp-bar"><i style="width:' + pct + '%"></i></div>' +
@@ -456,13 +456,47 @@
 
     var data = kb ? kb[subjectId] : null;
     var subject = GameSubjects.get(subjectId);
-    if (!data || !subject) {
-      notFound('这个科目还没有知识星图。');
+    if (!subject) {
+      notFound('这个科目还没有地图。');
       return;
     }
 
-    var total = data.chapters.reduce(function (n, c) { return n + c.pts.length; }, 0);
-    var chaptersHTML = data.chapters.map(function (ch, i) {
+    var bookChapters = data ? data.chapters : [];
+    var levels = GameSubjects.levels(subjectId) || [];
+
+    function trimStem(stem) {
+      var s = String(stem || '').replace(/[（(][^）)]*[）)]/g, '').trim();
+      return s.length > 26 ? s.slice(0, 26) + '…' : s;
+    }
+
+    // 闯关地图：每一关一章，知识点就是这一关的题目，常见错误来自干扰选项
+    var questChapters = levels.map(function (lv) {
+      var qs = lv.questions || [];
+      var pts = qs.map(function (q, qi) {
+        var miss = [];
+        if (q.type === 'choice' && q.options) {
+          q.options.forEach(function (text, oi) {
+            if (oi !== Number(q.answer)) miss.push('误选「' + text + '」');
+          });
+        } else if (q.type === 'judge') {
+          miss.push('把这道判断的正误看反');
+        } else if (q.type === 'fill') {
+          miss.push('填错词或写漏字');
+        } else if (q.type === 'match') {
+          miss.push('连线顺序搭错');
+        }
+        return {
+          n: trimStem(q.stem),
+          p: qi > 0 ? [trimStem(qs[qi - 1].stem)] : [],
+          m: miss.slice(0, 2),
+          d: q.type === 'judge' ? 0.28 : 0.4,
+          t: q.type === 'choice' ? 'procedural' : (q.type === 'judge' ? 'conceptual' : 'factual')
+        };
+      });
+      return { t: lv.title, level: lv.id, pts: pts, stars: starsOf(subjectId, lv.id) };
+    });
+
+    function chapterHTML(ch, i) {
       var list = ch.pts.map(function (p) {
         var typeName = { concept: '概念', procedural: '方法', factual: '事实' }[p.t] || '';
         var diffName = p.d >= 0.7 ? '较难' : (p.d >= 0.4 ? '中等' : '基础');
@@ -486,28 +520,49 @@
 
       return '<details class="kp-chapter"' + (i === 0 ? ' open' : '') + '>' +
         '<summary><span class="kp-ch-title">' + esc(ch.t) + '</span>' +
-        '<span class="kp-count">' + ch.pts.length + '</span></summary>' +
+        '<span class="kp-count">' + ch.pts.length + (ch.level ? ' 题' : ' 点') +
+          (ch.stars ? ' · ' + '★'.repeat(ch.stars) : '') + '</span></summary>' +
         '<div class="kp-list">' + list + '</div>' +
+        (ch.level ? '<div class="kp-go"><button class="btn ghost small" type="button" data-go-level="' +
+          ch.level + '">去闯这一关</button></div>' : '') +
         '</details>';
-    }).join('');
+    }
+
+    var questHTML = questChapters.map(chapterHTML).join('');
+    var bookHTML = bookChapters.map(chapterHTML).join('');
+    var bookTotal = bookChapters.reduce(function (n, c) { return n + c.pts.length; }, 0);
+    var questTotal = questChapters.reduce(function (n, c) { return n + c.pts.length; }, 0);
 
     view.innerHTML =
       '<div class="page-head with-action">' +
-        '<div><h1>🗺️ ' + esc(subject.icon) + ' ' + esc(subject.name) + '知识星图</h1>' +
-        '<p>共 ' + data.chapters.length + ' 章 / ' + total + ' 个知识点。点开章节查看前置知识和常见错误。</p></div>' +
+        '<div><h1>🗺️ ' + esc(subject.icon) + ' ' + esc(subject.name) + '地图</h1>' +
+        '<p>' + questChapters.length + ' 个任务 / ' + questTotal + ' 个考点 · 教材图谱 ' +
+          bookChapters.length + ' 章 / ' + bookTotal + ' 个知识点</p></div>' +
         '<button class="btn ghost small" id="mapBack" type="button">返回任务</button>' +
       '</div>' +
-      '<div class="kp-search"><input id="kpSearch" type="search" placeholder="搜索知识点，例如：绝对值、光合作用、现在进行时"></div>' +
-      '<div id="kpChapters">' + chaptersHTML + '</div>' +
-      '<div class="legend">知识点数据来自 k12-knowledge-points（PolyForm Noncommercial 1.0.0），仅用于个人学习，不可商用。</div>';
+      '<div class="map-tabs" id="mapTabs">' +
+        '<button class="map-tab on" type="button" data-mode="quest">闯关地图</button>' +
+        '<button class="map-tab" type="button" data-mode="book"' + (bookHTML ? '' : ' disabled') + '>教材图谱</button>' +
+      '</div>' +
+      '<div class="kp-search"><input id="kpSearch" type="search" placeholder="搜索考点，例如：绝对值、光合作用、现在进行时"></div>' +
+      '<div id="kpChapters">' +
+        '<div id="kpQuest">' + questHTML + '</div>' +
+        '<div id="kpBook" hidden>' + (bookHTML || '<div class="empty small-empty">这一科还没有教材图谱。</div>') + '</div>' +
+      '</div>' +
+      '<div class="legend">闯关地图由题库自动生成；教材图谱来自 k12-knowledge-points（PolyForm Noncommercial 1.0.0），仅用于个人学习，不可商用。</div>';
 
     document.getElementById('mapBack').onclick = function () { go('#/subject/' + subjectId); };
 
     var search = document.getElementById('kpSearch');
-    search.addEventListener('input', function () {
+    var questBox = document.getElementById('kpQuest');
+    var bookBox = document.getElementById('kpBook');
+    var mode = 'quest';
+
+    function applySearch() {
       var kw = search.value.trim().toLowerCase();
-      view.querySelectorAll('.kp-chapter').forEach(function (box) {
-        var any = false;
+      var active = mode === 'quest' ? questBox : bookBox;
+      active.querySelectorAll('.kp-chapter').forEach(function (box) {
+        var any = !kw;
         box.querySelectorAll('.kp-item').forEach(function (item) {
           var hit = !kw || item.textContent.toLowerCase().indexOf(kw) !== -1;
           item.hidden = !hit;
@@ -516,7 +571,39 @@
         box.hidden = !any;
         if (kw && any) box.open = true;
       });
+    }
+
+    function syncMode() {
+      questBox.hidden = mode !== 'quest';
+      bookBox.hidden = mode !== 'book';
+      var active = mode === 'quest' ? questBox : bookBox;
+      view.querySelectorAll('#mapTabs .map-tab').forEach(function (t) {
+        t.classList.toggle('on', t.getAttribute('data-mode') === mode);
+      });
+      // 非活动分栏的条目全部收起，搜索统计只看当前视图
+      view.querySelectorAll('#kpChapters .kp-item').forEach(function (item) {
+        if (!active.contains(item)) item.hidden = true;
+      });
+      applySearch();
+    }
+
+    search.addEventListener('input', applySearch);
+
+    view.querySelectorAll('#mapTabs .map-tab').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.disabled) return;
+        mode = btn.getAttribute('data-mode');
+        syncMode();
+      });
     });
+
+    view.querySelectorAll('[data-go-level]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        go('#/brief/' + subjectId + '/' + btn.getAttribute('data-go-level'));
+      });
+    });
+
+    syncMode();
   }
 
   /* ---------- 任务简报 ---------- */
@@ -609,7 +696,7 @@
       effects: effects,
       followUps: GameMissions.followUps(levelId),
       onChest: function (info) {
-        openChest(info.tier, subjectId, levelId, effects.coinRate);
+        openChest(info.tier, subjectId, levelId, effects.coinRate, info.diff);
       },
       onAnswer: function (info) {
         if (!info.correct && !info.skipped) {
@@ -718,15 +805,20 @@
 
   /* ---------- 宝箱 ---------- */
 
-  function openChest(tier, subjectId, excludeLevelId, coinRate) {
+  function openChest(kind, subjectId, excludeLevelId, coinRate, diffKey) {
     var q = GameRPG.chestQuestion(subjectId, excludeLevelId);
     if (!q) return;
-    var big = tier === 'big';
+    var tier = GameRPG.rollChestTier(kind, diffKey);
+    var tierInfo = GameRPG.chestTierInfo(tier);
+    var big = tier >= 3;
     var mask = document.createElement('div');
     mask.className = 'chest-mask';
-    mask.innerHTML = '<div class="chest-box' + (big ? ' big' : '') + '">' +
+    mask.style.setProperty('--glow', tierInfo.color);
+    mask.style.setProperty('--glow-soft', tierInfo.soft);
+    mask.innerHTML = '<div class="chest-box chest-r' + tier + (big ? ' big' : '') + '" data-tier="' + tier + '">' +
+      '<div class="chest-halo" aria-hidden="true"></div>' +
       '<div class="chest-orb">' + (big ? '🎁' : '📦') + '</div>' +
-      '<h2>' + (big ? '截获大宝箱' : '发现补给箱') + '</h2>' +
+      '<h2><span class="chest-rarity">' + esc(tierInfo.name) + '</span>' + esc(tierInfo.tag) + '</h2>' +
       '<p class="chest-sub">督察给箱子上了锁：答对这道题才能打开。</p>' +
       '<div class="chest-q">' +
         '<div class="qstem">' + esc(q.stem) + '</div>' +
@@ -770,7 +862,7 @@
           var reward = GameRPG.chestReward(tier, coinRate);
           GameStore.addCoins(reward.coins);
           if (reward.item) GameStore.addItem(reward.item.id, 1);
-          result.innerHTML = '<div class="chest-win">箱子开了！🪙 +' + reward.coins +
+          result.innerHTML = '<div class="chest-win">' + esc(tierInfo.name) + '宝箱开了！🪙 +' + reward.coins +
             (reward.item ? '<br>获得 ' + itemChip(reward.item) : '') + '</div>';
           close.textContent = '收下奖励';
           GameAudio.play('finish');
@@ -927,8 +1019,8 @@
       return '<button class="slot-card' + (item ? ' filled' : '') + '" type="button" data-slot="' + slot + '">' +
         '<span class="slot-name">' + GameItems.slots[slot].icon + ' ' + GameItems.slots[slot].name + '</span>' +
         (item
-          ? '<span class="slot-item r' + item.rarity + '">' + item.icon + '<b>' + esc(item.name) + '</b></span>'
-          : '<span class="slot-empty">未装备</span>') +
+          ? '<span class="slot-item r' + item.rarity + '">' + GameAvatar.art(item, 30) + '<b>' + esc(item.name) + '</b></span>'
+          : '<span class="slot-empty">' + GameAvatar.art(null, 30) + '未装备</span>') +
         '</button>';
     }).join('');
 
@@ -943,7 +1035,7 @@
       var item = entry.item;
       var equipped = p.equipped[item.slot] === item.id;
       return '<button class="bag-item r' + item.rarity + '" type="button" data-item="' + item.id + '">' +
-        '<span class="bi-icon">' + item.icon + '</span>' +
+        '<span class="bi-icon">' + GameAvatar.art(item, 34) + '</span>' +
         '<span class="bi-name">' + esc(item.name) + '</span>' +
         '<span class="bi-meta">' + GameItems.rarity[item.rarity].name +
           (entry.count > 1 ? ' ×' + entry.count : '') + '</span>' +
@@ -954,6 +1046,17 @@
     view.innerHTML =
       '<div class="page-head"><h1>🎒 装备舱</h1>' +
       '<p>装备会改变任务中的规则；补给使用后立即生效。</p></div>' +
+      '<div class="bag-preview">' +
+        '<div class="bp-stage">' + GameAvatar.figure(p, 126) + '</div>' +
+        '<div class="bp-tip"><b>K-7 换装预览</b>' +
+          '<span>穿上的头盔、翅膀、护甲、武器会直接画在这个小人身上。</span>' +
+          '<span class="bp-slots">' + slotNames.map(function (slot) {
+            var it = p.equipped[slot] ? GameItems.get(p.equipped[slot]) : null;
+            return '<i class="bp-slot' + (it ? ' on' : '') + '" title="' +
+              esc(GameItems.slots[slot].name) + '">' + (it ? GameAvatar.art(it, 22) : '') + '</i>';
+          }).join('') + '</span>' +
+        '</div>' +
+      '</div>' +
       '<div class="slot-grid">' + slotsHTML + '</div>' +
       '<div class="bag-summary">' +
         '<span>🪙 ' + (p.coins || 0) + ' 金币</span>' +
@@ -985,7 +1088,7 @@
 
     openModal(
       '<div class="item-modal r' + item.rarity + '">' +
-        '<div class="im-icon">' + item.icon + '</div>' +
+        '<div class="im-icon">' + GameAvatar.art(item, 76) + '</div>' +
         '<h2>' + esc(item.name) + '</h2>' +
         '<div class="im-rarity">' + GameItems.rarity[item.rarity].name +
           ' · ' + (GameItems.slots[item.slot] ? GameItems.slots[item.slot].name : '物品') + '</div>' +

@@ -24,12 +24,35 @@
     },
     legend: {
       key: 'legend', name: '高级', icon: '🔥', tag: '督察突袭',
-      desc: '全部题目 + 已学章节跨区题 · 每题 20 秒 · 答错扣 50 分',
-      pick: 0, timeLimit: 20, penalty: 50, retry: 0,
-      coinRate: 1.8, expRate: 1.6, drop: 1,
-      starLine: [0.8, 0.9, 1]
+      desc: '全部题目 + 3 道跨区题 · 每题 15 秒 · 答错扣 80 分 · 三星需全对',
+      pick: 0, timeLimit: 15, penalty: 80, retry: 0,
+      coinRate: 2.1, expRate: 1.8, drop: 1, extra: 3,
+      starLine: [0.85, 0.95, 1]
     }
   };
+
+  /* 宝箱等级：白 普通 / 绿 精良 / 蓝 稀有 / 黄 传说 / 红 神话 */
+  var CHEST_TIERS = [
+    { key: 1, name: '普通', color: '#ffffff', soft: 'rgba(255,255,255,.55)', tag: '补给箱' },
+    { key: 2, name: '精良', color: '#43d68a', soft: 'rgba(67,214,138,.55)', tag: '补给箱' },
+    { key: 3, name: '稀有', color: '#4a9df8', soft: 'rgba(74,157,248,.55)', tag: '宝箱' },
+    { key: 4, name: '传说', color: '#f7c744', soft: 'rgba(247,199,68,.55)', tag: '宝箱' },
+    { key: 5, name: '神话', color: '#ff4d4d', soft: 'rgba(255,77,77,.55)', tag: '宝箱' }
+  ];
+
+  function chestTierInfo(tier) {
+    var t = Math.min(5, Math.max(1, Number(tier) || 1));
+    return CHEST_TIERS[t - 1];
+  }
+
+  /* 掉出几级箱子：小箱 1—2，大箱 3—5，高级难度整体升一级 */
+  function rollChestTier(kind, diffKey) {
+    var weights = kind === 'big' ? { 3: 0.58, 4: 0.32, 5: 0.1 } : { 1: 0.7, 2: 0.3 };
+    var tier = pickWeighted(weights);
+    if (diffKey === 'legend') tier = Math.min(5, tier + 1);
+    if (diffKey === 'rookie' && kind === 'big') tier = Math.max(1, tier - 1);
+    return tier;
+  }
 
   function difficultyList() {
     return [DIFFS.rookie, DIFFS.agent, DIFFS.legend];
@@ -64,17 +87,45 @@
     return Number(keys[keys.length - 1]);
   }
 
+  /* 题干归一化：去空白、标点、括号里的提示，用来判重 */
+  function stemKey(stem) {
+    return String(stem || '')
+      .replace(/[（(][^）)]*[）)]/g, '')
+      .replace(/[\s，。、；：！？,.;:!?"'“”‘’《》·\-—_/\\|]/g, '')
+      .toLowerCase();
+  }
+
+  /* 按 id 与题干双重去重，保留第一次出现的题目 */
+  function uniqueQuestions(list) {
+    var seenId = {};
+    var seenStem = {};
+    var out = [];
+    list.forEach(function (q) {
+      if (!q) return;
+      var sk = stemKey(q.stem);
+      if (q.id) {
+        if (seenId[q.id]) return;
+      }
+      if (sk && seenStem[sk]) return;
+      if (q.id) seenId[q.id] = true;
+      if (sk) seenStem[sk] = true;
+      out.push(q);
+    });
+    return out;
+  }
+
   /**
    * 按难度组装本关题目。
    * rookie：优先选题干较短的选择/判断题，共 6 道
    * agent：本关全部题目
-   * legend：本关全部 + 其他关随机 2 道跨区题
+   * legend：本关全部 + 其他关随机 3 道跨区题
+   * 无论哪档，同一局里不会出现 id 或题干重复的题目。
    */
   function buildQuestionSet(subjectId, levelId, diffKey) {
     var level = GameSubjects.level(subjectId, levelId);
     if (!level) return { questions: [], extraCount: 0, diff: getDifficulty(diffKey) };
     var diff = getDifficulty(diffKey);
-    var all = level.questions.slice();
+    var all = uniqueQuestions(level.questions.slice());
     var picked;
 
     if (diff.pick && all.length > diff.pick) {
@@ -93,7 +144,7 @@
     }
 
     var extra = [];
-    if (diffKey === 'legend') {
+    if (diff.extra) {
       // 跨区题只从“已挑战过的任务”或“当前任务之前的任务”里抽，
       // 避免第一次玩就抽到后面还没学的章节。
       var allLevels = GameSubjects.levels(subjectId);
@@ -110,12 +161,13 @@
           lv.questions.forEach(function (q) { pool.push(q); });
         }
       });
-      extra = shuffle(pool).slice(0, 2);
+      extra = uniqueQuestions(shuffle(pool)).slice(0, diff.extra);
     }
 
+    var merged = uniqueQuestions(picked.concat(extra));
     return {
-      questions: shuffle(picked.concat(extra)),
-      extraCount: extra.length,
+      questions: shuffle(merged),
+      extraCount: Math.max(0, merged.length - picked.length),
       diff: diff
     };
   }
@@ -166,6 +218,7 @@
 
   /**
    * 宝箱题目：优先从本科目其他关卡抽一道选择/判断题，跨章节复习。
+   * 本关的题目不会出现在宝箱里，避免刚答过的题又冒出来。
    */
   function chestQuestion(subjectId, excludeLevelId) {
     var pool = [];
@@ -178,27 +231,38 @@
         }
       });
     });
-    var list = pool.length ? pool : fallback;
+    var list = uniqueQuestions(pool.length ? pool : fallback);
     if (!list.length) return null;
     return list[Math.floor(Math.random() * list.length)];
   }
 
+  /**
+   * 宝箱奖励。tier 可以是 1—5 的等级，也可以是旧的 'small' / 'big'。
+   */
   function chestReward(tier, coinRate) {
-    var big = tier === 'big';
-    var coins = Math.round((big ? rand(80, 150) : rand(30, 60)) * (1 + (coinRate || 0)));
+    var level = tier === 'small' ? 2 : tier === 'big' ? 4 : Math.min(5, Math.max(1, Number(tier) || 1));
+    var info = chestTierInfo(level);
+    var coins = Math.round((10 + level * 22 + rand(0, 18)) * (1 + (coinRate || 0)));
     var item = null;
 
-    if (Math.random() < (big ? 0.7 : 0.35)) {
-      var rarity = pickWeighted(big
-        ? { 2: 0.45, 3: 0.4, 4: 0.15 }
-        : { 1: 0.55, 2: 0.35, 3: 0.1 });
+    // 箱子等级越高，出好装备的概率与保底稀有度越高
+    var chance = [0, 0.3, 0.45, 0.62, 0.78, 0.9][level];
+    if (Math.random() < chance) {
+      var weights = level <= 2
+        ? { 1: 0.6, 2: 0.35, 3: 0.05 }
+        : level === 3
+          ? { 1: 0.15, 2: 0.55, 3: 0.3 }
+          : level === 4
+            ? { 2: 0.3, 3: 0.5, 4: 0.2 }
+            : { 3: 0.35, 4: 0.65 };
+      var rarity = pickWeighted(weights);
       var pool = GameItems.list.filter(function (i) {
         return i.rarity === rarity && i.slot !== 'food';
       });
       if (pool.length) item = pool[Math.floor(Math.random() * pool.length)];
     }
-    if (!item) coins += big ? 60 : 25;
-    return { coins: coins, item: item, tier: tier };
+    if (!item) coins += level * 18;
+    return { coins: coins, item: item, tier: level, tierInfo: info };
   }
 
   /**
@@ -244,6 +308,9 @@
   global.GameRPG = {
     difficultyList: difficultyList,
     getDifficulty: getDifficulty,
+    chestTiers: CHEST_TIERS,
+    chestTierInfo: chestTierInfo,
+    rollChestTier: rollChestTier,
     buildQuestionSet: buildQuestionSet,
     starsFor: starsFor,
     rankFor: rankFor,

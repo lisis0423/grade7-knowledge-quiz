@@ -591,11 +591,11 @@
           global.GameAudio.play(state.combo >= 3 ? 'combo' : 'correct');
           if (!chestFired.small && state.combo === 3) {
             chestFired.small = true;
-            if (onChest) setTimeout(function () { onChest({ tier: 'small' }); }, 350);
+            if (onChest) setTimeout(function () { onChest({ tier: 'small', diff: difficulty.key }); }, 350);
           }
           if (!chestFired.big && state.combo === 6) {
             chestFired.big = true;
-            if (onChest) setTimeout(function () { onChest({ tier: 'big' }); }, 350);
+            if (onChest) setTimeout(function () { onChest({ tier: 'big', diff: difficulty.key }); }, 350);
           }
         }
         onAnswer({ question: q, correct: true, gain: state.answers[state.answers.length - 1].gain });

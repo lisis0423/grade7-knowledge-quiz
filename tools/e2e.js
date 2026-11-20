@@ -12,6 +12,7 @@ const SCRIPTS = [
   'js/store.js',
   'js/audio.js',
   'data/items.js',
+  'js/avatar.js',
   'data/missions.js',
   'data/missions-more.js',
   'data/missions-extra.js',
@@ -113,7 +114,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       if (!btn) throw new Error('找不到正确选项: ' + right);
       await click(btn, 20);
     } else if (q.type === 'judge') {
-      const btn = $$('.option').find((b) => b.getAttribute('data-value') === String(q.answer));
+      const want = String(q.answer);
+      const btn = $$('.option').find((b) => String(b.getAttribute('data-value')) === want);
+      if (!btn) {
+        throw new Error('判断题按钮不匹配 want=' + want + ' page=' +
+          $$('.option').map((b) => b.getAttribute('data-value') + '@' + txt(b.querySelector('.opt-text'))).join('/') +
+          ' hash=' + w.location.hash);
+      }
       await click(btn, 20);
     } else if (q.type === 'fill') {
       $('#fillInput').value = q.accept[0];
@@ -233,8 +240,22 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   w.GameStore.recordMission('geo-7a-1', 'agent', { score: 100, stars: 2 });
   const setLegend2 = w.GameRPG.buildQuestionSet('geography', 'geo-7a-2', 'legend');
   check('高级档会加入已学章节的跨区题',
-    setLegend2.questions.length === 12 && setLegend2.extraCount === 2,
+    setLegend2.questions.length === 13 && setLegend2.extraCount === 3,
     setLegend2.questions.length + '/' + setLegend2.extraCount);
+
+  let dupLevel = '';
+  w.GameSubjects.all().forEach(function (sub) {
+    sub.levels.forEach(function (lv) {
+      const built = w.GameRPG.buildQuestionSet(sub.id, lv.id, 'legend');
+      const seen = {};
+      built.questions.forEach(function (q) {
+        const key = String(q.stem || '').replace(/\s/g, '');
+        if (seen[key]) dupLevel = lv.id;
+        seen[key] = 1;
+      });
+    });
+  });
+  check('所有关卡单次组题都不重复', dupLevel === '', dupLevel);
 
   /* ---------- 4. 章节全对 ---------- */
   console.log('\n[4] 执行任务（中级，全对）');
@@ -442,6 +463,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   check('四个装备槽', $$('.slot-card').length === 4, $$('.slot-card').length);
   check('背包含物品', $$('.bag-item').length >= 3, $$('.bag-item').length);
   check('补给单独分组', $$('.bag-grid').length === 2, $$('.bag-grid').length);
+  check('装备舱有换装立绘', !!$('.bag-preview .av-figure'));
+  check('背包图标是内联矢量图', $$('.bag-item .av-art').length >= 3, $$('.bag-item .av-art').length);
 
   await click($('[data-item="hoverboard"]'), 60);
   check('物品详情弹窗出现', !!$('.item-modal'));
@@ -523,6 +546,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   check('知识点已渲染', $$('.kp-item').length > 0, $$('.kp-item').length);
   check('显示前置知识', txt($('#kpChapters')).indexOf('前置') !== -1);
   check('显示常见错误', txt($('#kpChapters')).indexOf('常见错误') !== -1);
+  check('默认显示闯关地图', $$('#kpQuest .kp-chapter').length === 10 && !$('#kpQuest').hidden,
+    $$('#kpQuest .kp-chapter').length);
+  check('每个任务都能从地图跳转', $$('[data-go-level]').length === 10, $$('[data-go-level]').length);
+
+  await click($('#mapTabs [data-mode="book"]'), 120);
+  check('可切换到教材图谱', !$('#kpBook').hidden && $$('#kpBook .kp-chapter').length >= 9,
+    $$('#kpBook .kp-chapter').length);
+  await click($('#mapTabs [data-mode="quest"]'), 120);
+  check('可切回闯关地图', !$('#kpQuest').hidden);
 
   const kpSearch = $('#kpSearch');
   kpSearch.value = '绝对值';
@@ -543,11 +575,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   check('填空忽略空格与全角', judge({ type: 'fill', accept: ['6371千米'] }, ' ６３７１ 千米 ') === true);
   check('连线全对判对',
     judge({ type: 'match', left: ['a', 'b'], right: ['x', 'y'], answer: [1, 0] }, { 0: 1, 1: 0 }) === true);
-  check('高级 100% 才是三星',
-    w.GameRPG.starsFor(11, 12, 'legend') === 2 && w.GameRPG.starsFor(12, 12, 'legend') === 3);
+  check('高级 100% 才是三星，错一题只给一星',
+    w.GameRPG.starsFor(11, 12, 'legend') === 1 && w.GameRPG.starsFor(12, 12, 'legend') === 3);
   check('基础档门槛更低',
     w.GameRPG.starsFor(9, 10, 'rookie') === 3 && w.GameRPG.starsFor(9, 10, 'agent') === 2);
   check('评级 S 需要满分', w.GameRPG.rankFor(3, 100).key === 'S' && w.GameRPG.rankFor(3, 90).key === 'A');
+  check('宝箱五档光效颜色',
+    ['#ffffff', '#43d68a', '#4a9df8', '#f7c744', '#ff4d4d'].every(function (c, i) {
+      return w.GameRPG.chestTierInfo(i + 1).color === c;
+    }));
+  check('高级难度的宝箱等级更高', w.GameRPG.rollChestTier('small', 'legend') >= 2,
+    w.GameRPG.rollChestTier('small', 'legend'));
   check('装备效果叠加', (function () {
     const e = w.GameRPG.effectsOf({
       equipped: { tool: 'hoverboard', weapon: 'pulsegun', armor: 'armor', wings: 'wings' }

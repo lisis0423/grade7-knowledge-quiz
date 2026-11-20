@@ -143,6 +143,10 @@ function fetchText(url) {
   check('进入任务简报', w.location.hash === '#/brief/geography/geo-7a-1', w.location.hash);
   check('三档难度卡', $$('.diff-card').length === 3, $$('.diff-card').length);
   check('默认中级', $('.diff-card.selected').getAttribute('data-diff') === 'agent');
+  check('高级难度已加强（15 秒 / 扣 80）',
+    txt($('[data-diff="legend"] .dc-desc')).indexOf('15 秒') !== -1 &&
+    txt($('[data-diff="legend"] .dc-desc')).indexOf('80') !== -1,
+    txt($('[data-diff="legend"] .dc-desc')));
   await click($('#startMission'), 180);
   check('进入答题页', w.location.hash.indexOf('#/play/geography/geo-7a-1/agent') === 0, w.location.hash);
   check('题目卡片渲染', !!$('.qcard'));
@@ -181,6 +185,10 @@ function fetchText(url) {
   check('知识点已渲染', $$('.kp-item').length > 0, $$('.kp-item').length);
   check('显示前置知识', txt($('#kpChapters')).indexOf('前置') !== -1);
   check('显示常见错误', txt($('#kpChapters')).indexOf('常见错误') !== -1);
+  check('默认显示闯关路线图', $$('#kpQuest .kp-chapter').length >= 10, $$('#kpQuest .kp-chapter').length);
+  await click($('#mapTabs [data-mode="book"]'), 150);
+  check('可切到教材图谱', !$('#kpBook').hidden && $$('#kpBook .kp-chapter').length >= 9,
+    $$('#kpBook .kp-chapter').length);
 
   const onlineSearch = $('#kpSearch');
   onlineSearch.value = '绝对值';
@@ -191,7 +199,12 @@ function fetchText(url) {
     $$('.kp-item:not([hidden])').length < $$('.kp-item').length,
     $$('.kp-item:not([hidden])').length + '/' + $$('.kp-item').length);
 
-  console.log('\n[7] 运行时错误');
+  console.log('\n[7] 装备舱换装');
+  await go('#/bag');
+  check('装备舱有换装立绘', !!$('.bag-preview .av-figure'));
+  check('装备图标为内联 SVG', $$('.av-art').length > 0, $$('.av-art').length);
+
+  console.log('\n[8] 运行时错误');
   check('没有未捕获的脚本错误', errors.length === 0, errors.slice(0, 2).join(' | '));
 
   fs.writeFileSync(path.join(__dirname, 'online-result.txt'), 'pass=' + pass + ' fail=' + fail + '\n' + failList.join('\n'), 'utf8');
